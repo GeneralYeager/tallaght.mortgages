@@ -38,7 +38,7 @@ custom:
 
 functions:
   create:
-    handler: mortgage/create.create
+    handler: mortgage/api/create.create
     events:
       - http:
           path: mortgage
@@ -46,7 +46,7 @@ functions:
           cors: true
 
   list:
-    handler: mortgage/list.list
+    handler: mortgage/api/list.list
     events:
       - http:
           path: mortgage
@@ -54,7 +54,7 @@ functions:
           cors: true
 
   get:
-    handler: mortgage/get.get
+    handler: mortgage/api/get.get
     events:
       - http:
           path: mortgage/{id}
@@ -62,7 +62,7 @@ functions:
           cors: true
 
   update:
-    handler: mortgage/update.update
+    handler: mortgage/api/update.update
     events:
       - http:
           path: mortgage/{id}
@@ -70,7 +70,7 @@ functions:
           cors: true
 
   delete:
-    handler: mortgage/delete.delete
+    handler: mortgage/api/delete.delete
     events:
       - http:
           path: mortgage/{id}
