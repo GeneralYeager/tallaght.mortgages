@@ -10,7 +10,7 @@ Resources:
   GetMortgageFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://ad.aws.s3.codedeploy/31e7bba76a72329f23a90304e0a6bafa
+      CodeUri: s3://ad.aws.s3.codedeploy/ea0b0a1d9f24874e22042622bdf55ea0
       Handler: get.get
       Runtime: nodejs10.x
       Role: arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role
@@ -23,7 +23,7 @@ Resources:
   CreateMortgageFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://ad.aws.s3.codedeploy/3995723307f6aaf536d0f269f2054003
+      CodeUri: s3://ad.aws.s3.codedeploy/52692b0363002ed018530d81822b59dc
       Handler: create.create
       Runtime: nodejs10.x
       Role: arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role
@@ -33,6 +33,32 @@ Resources:
           Properties:
             Path: /mortgage/
             Method: PUT
+  DeleteMortgageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://ad.aws.s3.codedeploy/955c17c529ca161900488421ca591915
+      Handler: delete.delete
+      Runtime: nodejs10.x
+      Role: arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role
+      Events:
+        DeleteMortgageEvent:
+          Type: Api
+          Properties:
+            Path: /mortgage/{id}
+            Method: DELETE
+  ListByStatusMortgageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://ad.aws.s3.codedeploy/ac5a17b674e5dc9d37923f84f8f7c58b
+      Handler: list.list
+      Runtime: nodejs10.x
+      Role: arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role
+      Events:
+        ListByStatusMortgageEvent:
+          Type: Api
+          Properties:
+            Path: /mortgage/
+            Method: GET
 Outputs:
   MortgageApi:
     Description: API Gateway endpoint URL for Prod stage for GetMortgageFunctionRole
@@ -49,4 +75,16 @@ Outputs:
     Value:
       Fn::GetAtt:
       - CreateMortgageFunction
+      - Arn
+  DeleteMortgageFunction:
+    Description: DeleteMortgageFunctionARN
+    Value:
+      Fn::GetAtt:
+      - DeleteMortgageFunction
+      - Arn
+  ListByStatusMortgageFunction:
+    Description: ListByStatusMortgageFunctionARN
+    Value:
+      Fn::GetAtt:
+      - ListByStatusMortgageFunction
       - Arn

@@ -7,6 +7,12 @@ Globals:
   Function:
     Timeout: 3
 
+Parameters: 
+  LambdaRoleParameter: 
+    Type: String
+    Default: "arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role"
+    Description: Enter the ARN of an applicable IAM Role for the Lambda Functions
+
 Resources:
   GetMortgageFunction:
     Type: AWS::Serverless::Function
@@ -14,8 +20,9 @@ Resources:
       CodeUri: mortgages/
       Handler: get.get
       Runtime: nodejs10.x
- #     Role: GetAtt MortgageLambdaRole.Arn
-      Role: "arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role"
+    #  Role: "arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role"
+      Role: 
+        Ref: LambdaRoleParameter
       Events:
         GetMortgageEvent:
           Type: Api
@@ -28,7 +35,6 @@ Resources:
       CodeUri: mortgages/
       Handler: create.create
       Runtime: nodejs10.x
- #     Role: GetAtt MortgageLambdaRole.Arn
       Role: "arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role"
       Events:
         CreateMortgageEvent:
@@ -36,6 +42,45 @@ Resources:
           Properties:
             Path: /mortgage/
             Method: PUT
+  CreateMortgageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: mortgages/
+      Handler: update.update
+      Runtime: nodejs10.x
+      Role: "arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role"
+      Events:
+        CreateMortgageEvent:
+          Type: Api
+          Properties:
+            Path: /mortgage/
+            Method: POST
+  DeleteMortgageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: mortgages/
+      Handler: delete.delete
+      Runtime: nodejs10.x
+      Role: "arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role"
+      Events:
+        DeleteMortgageEvent:
+          Type: Api
+          Properties:
+            Path: /mortgage/{id}
+            Method: DELETE
+  ListByStatusMortgageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: mortgages/
+      Handler: list.list
+      Runtime: nodejs10.x
+      Role: "arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role"
+      Events:
+        ListByStatusMortgageEvent:
+          Type: Api
+          Properties:
+            Path: /mortgage/
+            Method: GET
 
 #  MortgageLambdaRole:
  #   Type: AWS::IAM::Role
@@ -64,3 +109,9 @@ Outputs:
   CreateMortgageFunction:
     Description: "CreateMortgageFunctionARN"
     Value: !GetAtt CreateMortgageFunction.Arn
+  DeleteMortgageFunction:
+    Description: "DeleteMortgageFunctionARN"
+    Value: !GetAtt DeleteMortgageFunction.Arn
+  ListByStatusMortgageFunction:
+    Description: "ListByStatusMortgageFunctionARN"
+    Value: !GetAtt ListByStatusMortgageFunction.Arn

@@ -1,6 +1,7 @@
-let response;
+
 
 exports.get = async (event, context) => {
+    let response;
     try {
         const mortgageId = event.pathParameters.id;
         response = {

@@ -33,6 +33,32 @@ Resources:
           Properties:
             Path: /mortgage/
             Method: PUT
+  DeleteMortgageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: DeleteMortgageFunction
+      Handler: delete.delete
+      Runtime: nodejs10.x
+      Role: arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role
+      Events:
+        DeleteMortgageEvent:
+          Type: Api
+          Properties:
+            Path: /mortgage/{id}
+            Method: DELETE
+  ListByStatusMortgageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ListByStatusMortgageFunction
+      Handler: list.list
+      Runtime: nodejs10.x
+      Role: arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role
+      Events:
+        ListByStatusMortgageEvent:
+          Type: Api
+          Properties:
+            Path: /mortgage/
+            Method: GET
 Outputs:
   MortgageApi:
     Description: API Gateway endpoint URL for Prod stage for GetMortgageFunctionRole
@@ -49,4 +75,16 @@ Outputs:
     Value:
       Fn::GetAtt:
       - CreateMortgageFunction
+      - Arn
+  DeleteMortgageFunction:
+    Description: DeleteMortgageFunctionARN
+    Value:
+      Fn::GetAtt:
+      - DeleteMortgageFunction
+      - Arn
+  ListByStatusMortgageFunction:
+    Description: ListByStatusMortgageFunctionARN
+    Value:
+      Fn::GetAtt:
+      - ListByStatusMortgageFunction
       - Arn
