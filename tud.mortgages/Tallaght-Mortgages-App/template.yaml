@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Tallaght-Mortgages-App
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  GetMortgageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: mortgages/
+      Handler: get.get
+      Runtime: nodejs10.x
+ #     Role: GetAtt MortgageLambdaRole.Arn
+      Role: "arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role"
+      Events:
+        GetMortgageEvent:
+          Type: Api
+          Properties:
+            Path: /mortgage/{id}
+            Method: GET
+  CreateMortgageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: mortgages/
+      Handler: create.create
+      Runtime: nodejs10.x
+ #     Role: GetAtt MortgageLambdaRole.Arn
+      Role: "arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role"
+      Events:
+        CreateMortgageEvent:
+          Type: Api
+          Properties:
+            Path: /mortgage/
+            Method: PUT
+
+#  MortgageLambdaRole:
+ #   Type: AWS::IAM::Role
+ #   Properties:
+ #     ManagedPolicyArns: 
+ #       -
+ #         "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+ #     AssumeRolePolicyDocument:
+  #      Version: "2012-10-17"
+  #      Statement: 
+  #        -
+  #          Action: "sts:AssumeRole"
+  #          Effect: "Allow"
+  #          Principal: 
+  #            Service: 
+  #              -
+   #               "lambda.amazonaws.com"
+
+Outputs:
+  MortgageApi:
+    Description: "API Gateway endpoint URL for Prod stage for GetMortgageFunctionRole"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/mortgage/"
+  GetMortgageFunction:
+    Description: "GetMortgageFunctionARN"
+    Value: !GetAtt GetMortgageFunction.Arn
+  CreateMortgageFunction:
+    Description: "CreateMortgageFunctionARN"
+    Value: !GetAtt CreateMortgageFunction.Arn

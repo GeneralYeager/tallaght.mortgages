@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'Tallaght-Mortgages-App
+
+  '
+Globals:
+  Function:
+    Timeout: 3
+Resources:
+  GetMortgageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: GetMortgageFunction
+      Handler: get.get
+      Runtime: nodejs10.x
+      Role: arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role
+      Events:
+        GetMortgageEvent:
+          Type: Api
+          Properties:
+            Path: /mortgage/{id}
+            Method: GET
+  CreateMortgageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: CreateMortgageFunction
+      Handler: create.create
+      Runtime: nodejs10.x
+      Role: arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role
+      Events:
+        CreateMortgageEvent:
+          Type: Api
+          Properties:
+            Path: /mortgage/
+            Method: PUT
+Outputs:
+  MortgageApi:
+    Description: API Gateway endpoint URL for Prod stage for GetMortgageFunctionRole
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/mortgage/
+  GetMortgageFunction:
+    Description: GetMortgageFunctionARN
+    Value:
+      Fn::GetAtt:
+      - GetMortgageFunction
+      - Arn
+  CreateMortgageFunction:
+    Description: CreateMortgageFunctionARN
+    Value:
+      Fn::GetAtt:
+      - CreateMortgageFunction
+      - Arn
