@@ -1,25 +1,44 @@
+const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
 
+const dynamoDb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 exports.get = async (event, context) => {
- /*   let response;
-    try {
-        const mortgageId = event.pathParameters.id;
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify({
-                message: 'Mortgage ID are ' + mortgageId,
-            })
-        }
-    } catch (err) {
-        console.log(err);
-        return err;
-    }
 
-    return response*/
-      // create a response
-  const response = {
-    statusCode: 200,
-    body: "customer get"
-  };
-  return response;
+    try {
+        const customerId = event.pathParameters.id;
+
+        var findCustomer = {
+            Key: {
+             "customerId": {
+               S: event.pathParameters.id
+              }
+            },
+            TableName: "CUSTOMER_TABLE"
+          };
+      
+          const findCustomerResponse = await dynamoDb.getItem(findCustomer).promise();
+          let foundCustomer = convertCustomerItemToHttpAPI(findCustomerResponse.Item)
+          console.log(foundCustomer);
+          return { statusCode: 200, body: JSON.stringify(foundCustomer) };
+    } catch (error) {
+        return {
+            statusCode: 400,
+            error: `Could not find the Customer: ${error.stack}`
+        };
+    }
+};
+
+function convertCustomerItemToHttpAPI(customerItem) {
+    let foundCustomer = {};
+
+    foundCustomer.lastName = customerItem.lastName.S;
+    foundCustomer.dob = customerItem.dob.S;
+    foundCustomer.currentAddress2 = customerItem.currentAddress2.S;
+    foundCustomer.currentAddress1 = customerItem.currentAddress1.S;
+    foundCustomer.firstName = customerItem.firstName.S;
+    foundCustomer.gender = customerItem.gender.S;
+    foundCustomer.customerId = customerItem.customerId.S;
+    foundCustomer.dob = customerItem.dob.S;                
+  
+    return foundCustomer;
 };

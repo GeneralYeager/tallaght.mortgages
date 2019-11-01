@@ -3,34 +3,82 @@
 //const uuid = require('uuid');
 const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
+const dynamoDb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 exports.update = async (event, context) => {
-/*  const timestamp = new Date().getTime();
-  const newMortgage = JSON.parse(event.body);
-  if (typeof newMortgage.mortgageId !== 'string' || newMortgage.mortgageId == null ||
-        typeof newMortgage.firstName !== 'string' || newMortgage.firstName == null ||
-        typeof newMortgage.lastName !== 'string' || newMortgage.lastName == null ||
-        typeof newMortgage.currentAddress1 !== 'string' || newMortgage.currentAddress1 == null ||
-        typeof newMortgage.currentAddress2 !== 'string' || newMortgage.currentAddress2 == null ||
-        typeof newMortgage.loanAmount !== 'number' || newMortgage.loanAmount == null ||
-        typeof newMortgage.yearsInEmployment !== 'number' || newMortgage.yearsInEmployment == null ||
-        typeof newMortgage.salary !== 'number' || newMortgage.salary == null ||
-        typeof newMortgage.employerName !== 'string' || newMortgage.employerName == null
+  const timestamp = new Date().getTime();
+
+  const customerId = event.pathParameters.id;
+
+  const customerRequest = JSON.parse(event.body);
+  if (typeof customerRequest.firstName !== 'string' || customerRequest.firstName == null ||
+        typeof customerRequest.lastName !== 'string' || customerRequest.lastName == null ||
+        typeof customerRequest.currentAddress1 !== 'string' || customerRequest.currentAddress1 == null ||
+        typeof customerRequest.currentAddress2 !== 'string' || customerRequest.currentAddress2 == null ||
+        typeof customerRequest.dob !== 'string' || customerRequest.dob== null ||
+        typeof customerRequest.gender !== 'string' || customerRequest.gender == null
   ) {
-    console.error('Validation Failed');
+    console.error('Customer Update Validation Failed');
     const errorResponse = {
       statusCode: 400,
       headers: { 'Content-Type': 'text/plain' },
-      body: 'Couldn\'t update the mortgage application.',
+      body: 'Couldn\'t update the new Customer.',
     };
     return errorResponse;
   }
-*/
-  // create a response
-  const response = {
-    statusCode: 200,
-    body: "customer update"
-  };
-  return response;
+
+  try {
+    
+    var newCustomer = {
+     TableName: "CUSTOMER_TABLE",
+      Key: {
+       "customerId": {
+         S: customerId
+        }
+      },
+      ExpressionAttributeNames: {
+        "#A": "firstName",
+        "#B": "lastName",
+        "#C": "currentAddress1",
+        "#D": "currentAddress2",
+        "#E": "dob",
+        "#F": "gender",
+      }, 
+      UpdateExpression: "set #A = :a, #B = :b, #C = :c, #D = :d, #E = :e, #F = :f",
+      ExpressionAttributeValues: {
+        ":a": { "S": customerRequest.firstName },
+        ":b": { "S": customerRequest.lastName },
+        ":c": { "S": customerRequest.currentAddress1 },
+        ":d": { "S": customerRequest.currentAddress2 },
+        ":e": { "S": customerRequest.dob },
+        ":f": { "S": customerRequest.gender }
+      },
+      ReturnValues: "ALL_NEW"
+    };
+
+    const updatedCustomerResponse = await dynamoDb.updateItem(newCustomer).promise();
+    const updatedCustomer = convertCustomerItemToHttpAPI(updatedCustomerResponse.Attributes);
+    return { statusCode: 200, body: JSON.stringify(updatedCustomer) };
+    
+  } catch (error) {
+    return {
+      statusCode: 400,
+      error: `Could not update the Customer: ${error.stack}`
+    };
+  }
+};
+
+function convertCustomerItemToHttpAPI(customerItem) {
+    let foundCustomer = {};
+
+    foundCustomer.lastName = customerItem.lastName.S;
+    foundCustomer.dob = customerItem.dob.S;
+    foundCustomer.currentAddress2 = customerItem.currentAddress2.S;
+    foundCustomer.currentAddress1 = customerItem.currentAddress1.S;
+    foundCustomer.firstName = customerItem.firstName.S;
+    foundCustomer.gender = customerItem.gender.S;
+    foundCustomer.customerId = customerItem.customerId.S;
+    foundCustomer.dob = customerItem.dob.S;                
+  
+    return foundCustomer;
 };

@@ -25,13 +25,9 @@ Resources:
         AttributeDefinitions:
           - AttributeName: customerId
             AttributeType: S
-          - AttributeName: lastName
-            AttributeType: S
         KeySchema:
           - AttributeName: customerId
             KeyType: HASH
-          - AttributeName: lastName
-            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
     MortgagesTable:
       Type: AWS::DynamoDB::Table
@@ -40,13 +36,9 @@ Resources:
         AttributeDefinitions:
           - AttributeName: mortgageId
             AttributeType: S
-          - AttributeName: customerId
-            AttributeType: S
         KeySchema:
           - AttributeName: mortgageId
             KeyType: HASH
-          - AttributeName: customerId
-            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
     MortgageStateTable:
       Type: AWS::DynamoDB::Table
@@ -55,13 +47,9 @@ Resources:
         AttributeDefinitions:
           - AttributeName: mortgageId
             AttributeType: S
-          - AttributeName: status
-            AttributeType: S
         KeySchema:
           - AttributeName: mortgageId
             KeyType: HASH
-          - AttributeName: status
-            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         
 Outputs:

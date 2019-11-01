@@ -56,7 +56,7 @@ Resources:
         UpdateCustomerEvent:
           Type: Api
           Properties:
-            Path: /customer/
+            Path: /customer/{id}
             Method: POST
 
   # MORTGAGE APIS
