@@ -1,28 +1,19 @@
-service: mortgage-database
+AWSTemplateFormatVersion: 2010-09-09
 
-custom:
-  stage: ${opt:stage, self:provider.stage}
-  mortgageTableName: ${self:custom.stage}.MORTGAGES_TABLE
-  mortgageStateTableName: ${self:custom.stage}.MORTGAGES_STATE_TABLE
-  customerTableName: ${self:custom.stage}.CUSTOMER_TABLE
-  idGenTableName: ${self:custom.stage}.ID_GEN_TABLE
-  
-provider:
-  name: aws
-  stage: dev
-  region: eu-west-1
+Parameters: 
+  DeploymentStage: 
+    Type: String
+    Default: "DEV"
 
-resources:
-  Resources:
+
+Resources:
     IDGenTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.idGenTableName}
+        TableName: "ID_GEN_TABLE"
         AttributeDefinitions:
           - AttributeName: idName
             AttributeType: S
-          - AttributeName: currentValue
-            AttributeType: N
         KeySchema:
           - AttributeName: idName
             KeyType: HASH
@@ -30,7 +21,7 @@ resources:
     CustomerTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.customerTableName}
+        TableName: "CUSTOMER_TABLE"
         AttributeDefinitions:
           - AttributeName: customerId
             AttributeType: S
@@ -45,12 +36,12 @@ resources:
     MortgagesTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.mortgageTableName}
+        TableName: "MORTGAGES_TABLE"
         AttributeDefinitions:
           - AttributeName: mortgageId
-            AttributeType: N
+            AttributeType: S
           - AttributeName: customerId
-            AttributeType: N
+            AttributeType: S
         KeySchema:
           - AttributeName: mortgageId
             KeyType: HASH
@@ -60,10 +51,10 @@ resources:
     MortgageStateTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.mortgageStateTableName}
+        TableName: "MORTGAGES_STATE_TABLE"
         AttributeDefinitions:
           - AttributeName: mortgageId
-            AttributeType: N
+            AttributeType: S
           - AttributeName: status
             AttributeType: S
         KeySchema:
@@ -72,32 +63,33 @@ resources:
           - AttributeName: status
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
-  Outputs:
+        
+Outputs:
     IDGenTableARN:
       Value:
          Fn::GetAtt:
           - IDGenTable
           - Arn
       Export:
-        Name: ${self:custom.stage}-IDGenTableARN
+        Name: IDGenTableARN
     CustomerTableARN:
       Value:
          Fn::GetAtt:
           - CustomerTable
           - Arn
       Export:
-        Name: ${self:custom.stage}-CustomerTableARN
+        Name: CustomerTableARN
     MortgagesTableARN:
       Value:
          Fn::GetAtt:
           - MortgagesTable
           - Arn
       Export:
-        Name: ${self:custom.stage}-MortgagesTableARN
+        Name: MortgagesTableARN
     MortgageStateTableARN:
       Value:
          Fn::GetAtt:
           - MortgageStateTable
           - Arn
       Export:
-        Name: ${self:custom.stage}-MortgagesStateTableARN
+        Name: MortgagesStateTableARN

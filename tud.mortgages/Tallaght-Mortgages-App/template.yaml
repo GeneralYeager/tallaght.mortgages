@@ -14,6 +14,52 @@ Parameters:
     Description: Enter the ARN of an applicable IAM Role for the Lambda Functions
 
 Resources:
+
+  # CUSTOMER APIS
+  GetCustomerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: customers/
+      Handler: get.get
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+      Events:
+        GetCustomerEvent:
+          Type: Api
+          Properties:
+            Path: /customer/{id}
+            Method: GET
+  CreateCustomerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: customers/
+      Handler: create.create
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+      Events:
+        CreateCustomerEvent:
+          Type: Api
+          Properties:
+            Path: /customer/
+            Method: PUT
+  UpdateCustomerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: customers/
+      Handler: update.update
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+      Events:
+        UpdateCustomerEvent:
+          Type: Api
+          Properties:
+            Path: /customer/
+            Method: POST
+
+  # MORTGAGE APIS
   GetMortgageFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -85,39 +131,32 @@ Resources:
             Path: /mortgage/
             Method: GET
 
-#  MortgageLambdaRole:
- #   Type: AWS::IAM::Role
- #   Properties:
- #     ManagedPolicyArns: 
- #       -
- #         "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
- #     AssumeRolePolicyDocument:
-  #      Version: "2012-10-17"
-  #      Statement: 
-  #        -
-  #          Action: "sts:AssumeRole"
-  #          Effect: "Allow"
-  #          Principal: 
-  #            Service: 
-  #              -
-   #               "lambda.amazonaws.com"
 
 Outputs:
   MortgageApi:
     Description: "API Gateway endpoint URL for Prod stage for GetMortgageFunctionRole"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/mortgage/"
-  GetMortgageFunction:
-    Description: "GetMortgageFunctionARN"
-    Value: !GetAtt GetMortgageFunction.Arn
-  CreateMortgageFunction:
-    Description: "CreateMortgageFunctionARN"
-    Value: !GetAtt CreateMortgageFunction.Arn
-  UpdateMortgageFunction:
-    Description: "UpdateMortgageFunctionARN"
-    Value: !GetAtt UpdateMortgageFunction.Arn
-  DeleteMortgageFunction:
-    Description: "DeleteMortgageFunctionARN"
-    Value: !GetAtt DeleteMortgageFunction.Arn
-  ListByStatusMortgageFunction:
-    Description: "ListByStatusMortgageFunctionARN"
-    Value: !GetAtt ListByStatusMortgageFunction.Arn
+  GetCustomerFunction:
+    Description: "GetCustomerFunctionARN"
+    Value: !GetAtt GetCustomerFunction.Arn
+  CreateCustomerFunction:
+    Description: "CreateCustomerFunctionARN"
+    Value: !GetAtt CreateCustomerFunction.Arn
+  UpdateCustomerFunction:
+    Description: "UpdateCustomerFunctionARN"
+    Value: !GetAtt UpdateCustomerFunction.Arn
+#  GetMortgageFunction:
+ #   Description: "GetMortgageFunctionARN"
+#    Value: !GetAtt GetMortgageFunction.Arn
+#  CreateMortgageFunction:
+#    Description: "CreateMortgageFunctionARN"
+ #   Value: !GetAtt CreateMortgageFunction.Arn
+#  UpdateMortgageFunction:
+ #   Description: "UpdateMortgageFunctionARN"
+ #   Value: !GetAtt UpdateMortgageFunction.Arn
+#  DeleteMortgageFunction:
+#    Description: "DeleteMortgageFunctionARN"
+ #   Value: !GetAtt DeleteMortgageFunction.Arn
+#  ListByStatusMortgageFunction:
+ #   Description: "ListByStatusMortgageFunctionARN"
+ #   Value: !GetAtt ListByStatusMortgageFunction.Arn

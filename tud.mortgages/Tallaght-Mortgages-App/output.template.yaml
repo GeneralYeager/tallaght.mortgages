@@ -6,14 +6,62 @@ Description: 'Tallaght-Mortgages-App
 Globals:
   Function:
     Timeout: 3
+Parameters:
+  LambdaRoleParameter:
+    Type: String
+    Default: arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role
+    Description: Enter the ARN of an applicable IAM Role for the Lambda Functions
 Resources:
+  GetCustomerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://ad.aws.s3.codedeploy/620d1a8b270a8e308049d6ac9cd4ab0d
+      Handler: get.get
+      Runtime: nodejs10.x
+      Role:
+        Ref: LambdaRoleParameter
+      Events:
+        GetCustomerEvent:
+          Type: Api
+          Properties:
+            Path: /customer/{id}
+            Method: GET
+  CreateCustomerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://ad.aws.s3.codedeploy/620d1a8b270a8e308049d6ac9cd4ab0d
+      Handler: create.create
+      Runtime: nodejs10.x
+      Role:
+        Ref: LambdaRoleParameter
+      Events:
+        CreateCustomerEvent:
+          Type: Api
+          Properties:
+            Path: /customer/
+            Method: PUT
+  UpdateCustomerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://ad.aws.s3.codedeploy/620d1a8b270a8e308049d6ac9cd4ab0d
+      Handler: update.update
+      Runtime: nodejs10.x
+      Role:
+        Ref: LambdaRoleParameter
+      Events:
+        UpdateCustomerEvent:
+          Type: Api
+          Properties:
+            Path: /customer/
+            Method: POST
   GetMortgageFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://ad.aws.s3.codedeploy/ea0b0a1d9f24874e22042622bdf55ea0
+      CodeUri: s3://ad.aws.s3.codedeploy/f8780d985137f9c4ebca5152be9cfa6d
       Handler: get.get
       Runtime: nodejs10.x
-      Role: arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role
+      Role:
+        Ref: LambdaRoleParameter
       Events:
         GetMortgageEvent:
           Type: Api
@@ -23,23 +71,39 @@ Resources:
   CreateMortgageFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://ad.aws.s3.codedeploy/52692b0363002ed018530d81822b59dc
+      CodeUri: s3://ad.aws.s3.codedeploy/f8780d985137f9c4ebca5152be9cfa6d
       Handler: create.create
       Runtime: nodejs10.x
-      Role: arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role
+      Role:
+        Ref: LambdaRoleParameter
       Events:
         CreateMortgageEvent:
           Type: Api
           Properties:
             Path: /mortgage/
             Method: PUT
+  UpdateMortgageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://ad.aws.s3.codedeploy/f8780d985137f9c4ebca5152be9cfa6d
+      Handler: update.update
+      Runtime: nodejs10.x
+      Role:
+        Ref: LambdaRoleParameter
+      Events:
+        CreateMortgageEvent:
+          Type: Api
+          Properties:
+            Path: /mortgage/
+            Method: POST
   DeleteMortgageFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://ad.aws.s3.codedeploy/955c17c529ca161900488421ca591915
+      CodeUri: s3://ad.aws.s3.codedeploy/f8780d985137f9c4ebca5152be9cfa6d
       Handler: delete.delete
       Runtime: nodejs10.x
-      Role: arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role
+      Role:
+        Ref: LambdaRoleParameter
       Events:
         DeleteMortgageEvent:
           Type: Api
@@ -49,10 +113,11 @@ Resources:
   ListByStatusMortgageFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://ad.aws.s3.codedeploy/ac5a17b674e5dc9d37923f84f8f7c58b
+      CodeUri: s3://ad.aws.s3.codedeploy/f8780d985137f9c4ebca5152be9cfa6d
       Handler: list.list
       Runtime: nodejs10.x
-      Role: arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role
+      Role:
+        Ref: LambdaRoleParameter
       Events:
         ListByStatusMortgageEvent:
           Type: Api
@@ -64,27 +129,21 @@ Outputs:
     Description: API Gateway endpoint URL for Prod stage for GetMortgageFunctionRole
     Value:
       Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/mortgage/
-  GetMortgageFunction:
-    Description: GetMortgageFunctionARN
+  GetCustomerFunction:
+    Description: GetCustomerFunctionARN
     Value:
       Fn::GetAtt:
-      - GetMortgageFunction
+      - GetCustomerFunction
       - Arn
-  CreateMortgageFunction:
-    Description: CreateMortgageFunctionARN
+  CreateCustomerFunction:
+    Description: CreateCustomerFunctionARN
     Value:
       Fn::GetAtt:
-      - CreateMortgageFunction
+      - CreateCustomerFunction
       - Arn
-  DeleteMortgageFunction:
-    Description: DeleteMortgageFunctionARN
+  UpdateCustomerFunction:
+    Description: UpdateCustomerFunctionARN
     Value:
       Fn::GetAtt:
-      - DeleteMortgageFunction
-      - Arn
-  ListByStatusMortgageFunction:
-    Description: ListByStatusMortgageFunctionARN
-    Value:
-      Fn::GetAtt:
-      - ListByStatusMortgageFunction
+      - UpdateCustomerFunction
       - Arn

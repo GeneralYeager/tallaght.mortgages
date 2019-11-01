@@ -5,10 +5,11 @@ const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-depe
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-exports.create = async (event, context) => {
-  const timestamp = new Date().getTime();
+exports.update = async (event, context) => {
+/*  const timestamp = new Date().getTime();
   const newMortgage = JSON.parse(event.body);
-  if (typeof newMortgage.firstName !== 'string' || newMortgage.firstName == null ||
+  if (typeof newMortgage.mortgageId !== 'string' || newMortgage.mortgageId == null ||
+        typeof newMortgage.firstName !== 'string' || newMortgage.firstName == null ||
         typeof newMortgage.lastName !== 'string' || newMortgage.lastName == null ||
         typeof newMortgage.currentAddress1 !== 'string' || newMortgage.currentAddress1 == null ||
         typeof newMortgage.currentAddress2 !== 'string' || newMortgage.currentAddress2 == null ||
@@ -21,15 +22,15 @@ exports.create = async (event, context) => {
     const errorResponse = {
       statusCode: 400,
       headers: { 'Content-Type': 'text/plain' },
-      body: 'Couldn\'t create the mortgage application.',
+      body: 'Couldn\'t update the mortgage application.',
     };
     return errorResponse;
   }
-
+*/
   // create a response
   const response = {
     statusCode: 200,
-    body: "Employer is " + newMortgage.employerName//JSON.stringify(params.Item),
+    body: "customer update"
   };
   return response;
 };
