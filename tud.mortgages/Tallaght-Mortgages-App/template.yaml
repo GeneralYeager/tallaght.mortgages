@@ -100,7 +100,7 @@ Resources:
         CreateMortgageEvent:
           Type: Api
           Properties:
-            Path: /mortgage/
+            Path: /mortgage/{id}
             Method: POST
   DeleteMortgageFunction:
     Type: AWS::Serverless::Function

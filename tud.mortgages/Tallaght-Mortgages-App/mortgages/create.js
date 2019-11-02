@@ -1,35 +1,90 @@
+
 'use strict';
 
 //const uuid = require('uuid');
 const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
+const dynamoDb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 exports.create = async (event, context) => {
-  const timestamp = new Date().getTime();
-  const newMortgage = JSON.parse(event.body);
-  if (typeof newMortgage.firstName !== 'string' || newMortgage.firstName == null ||
-        typeof newMortgage.lastName !== 'string' || newMortgage.lastName == null ||
-        typeof newMortgage.currentAddress1 !== 'string' || newMortgage.currentAddress1 == null ||
-        typeof newMortgage.currentAddress2 !== 'string' || newMortgage.currentAddress2 == null ||
-        typeof newMortgage.loanAmount !== 'number' || newMortgage.loanAmount == null ||
-        typeof newMortgage.yearsInEmployment !== 'number' || newMortgage.yearsInEmployment == null ||
-        typeof newMortgage.salary !== 'number' || newMortgage.salary == null ||
-        typeof newMortgage.employerName !== 'string' || newMortgage.employerName == null
+
+  const mortgageRequest = JSON.parse(event.body);
+  if (typeof mortgageRequest.loanAmount !== 'string' || mortgageRequest.loanAmount == null ||
+        typeof mortgageRequest.yearsInEmployment !== 'string' || mortgageRequest.yearsInEmployment == null ||
+        typeof mortgageRequest.salary !== 'string' || mortgageRequest.salary == null ||
+        typeof mortgageRequest.employerName !== 'string' || mortgageRequest.employerName == null ||
+        typeof mortgageRequest.term !== 'string' || mortgageRequest.term == null ||
+        typeof mortgageRequest.customerId !== 'string' || mortgageRequest.customerId == null
   ) {
     console.error('Validation Failed');
     const errorResponse = {
       statusCode: 400,
       headers: { 'Content-Type': 'text/plain' },
-      body: 'Couldn\'t create the mortgage application.',
+      body: 'Validation. Parameter types. Couldn\'t create the mortgage application.',
     };
     return errorResponse;
   }
 
-  // create a response
-  const response = {
-    statusCode: 200,
-    body: "Employer is " + newMortgage.employerName//JSON.stringify(params.Item),
-  };
-  return response;
+  
+  const timestamp = new Date().getTime();
+
+  try {
+    const genIdResponse = await dynamoDb.updateItem({
+        "TableName": "ID_GEN_TABLE",
+        "ReturnValues": "UPDATED_NEW",
+        "ExpressionAttributeValues": {
+          ":incr":{"N":"1"}
+        },
+        "UpdateExpression": "SET idValue = idValue + :incr",
+        "Key": {
+          "idName": {
+            "S": "MORTGAGE_ID_GEN"
+          }
+        }
+      }
+    ).promise();
+
+    const newMortgageId = genIdResponse.Attributes.idValue.N;
+
+    let newMortgage = {
+      Item: {
+        "mortgageId": {
+          S: newMortgageId
+        }, 
+       "customerId": {
+         S: mortgageRequest.customerId
+        }, 
+       "term": {
+         N: mortgageRequest.term
+        }, 
+       "employerName": {
+         S: mortgageRequest.employerName
+        }, 
+        "salary": {
+         N: mortgageRequest.salary
+        }, 
+        "yearsInEmployment": {
+         N: mortgageRequest.yearsInEmployment
+        }, 
+        "loanAmount": {
+         N: mortgageRequest.loanAmount
+        }, 
+        "mortgageStatus": {
+         S: "PreSubmission"
+        }
+      }, 
+      ReturnConsumedCapacity: "TOTAL", 
+      TableName: "MORTGAGES_TABLE"
+    };
+
+    const newMortgageResponse = await dynamoDb.putItem(newMortgage).promise();
+    
+    return { statusCode: 200, body: JSON.stringify(newMortgageId) };
+    
+  } catch (error) {
+    return {
+      statusCode: 400,
+      error: `Could not obtain new Mortgage ID: ${error.stack}`
+    };
+  }
 };

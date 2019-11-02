@@ -36,21 +36,31 @@ Resources:
         AttributeDefinitions:
           - AttributeName: mortgageId
             AttributeType: S
-        KeySchema:
-          - AttributeName: mortgageId
-            KeyType: HASH
-        BillingMode: PAY_PER_REQUEST
-    MortgageStateTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: "MORTGAGES_STATE_TABLE"
-        AttributeDefinitions:
-          - AttributeName: mortgageId
+#          - AttributeName: customerId
+#            AttributeType: S
+#          - AttributeName: term
+#            AttributeType: N
+#          - AttributeName: loanAmount
+#            AttributeType: N
+#          - AttributeName: salary
+#            AttributeType: N
+#          - AttributeName: employerName
+#            AttributeType: N
+#          - AttributeName: yearsInEmployment
+#            AttributeType: N
+          - AttributeName: mortgageStatus
             AttributeType: S
         KeySchema:
           - AttributeName: mortgageId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+        GlobalSecondaryIndexes:
+          - IndexName: MortgateStatusIndex
+            KeySchema:
+              - AttributeName: mortgageStatus
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
         
 Outputs:
     IDGenTableARN:
@@ -74,10 +84,3 @@ Outputs:
           - Arn
       Export:
         Name: MortgagesTableARN
-    MortgageStateTableARN:
-      Value:
-         Fn::GetAtt:
-          - MortgageStateTable
-          - Arn
-      Export:
-        Name: MortgagesStateTableARN

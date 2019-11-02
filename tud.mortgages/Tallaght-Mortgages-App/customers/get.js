@@ -1,3 +1,7 @@
+'use strict';
+
+
+
 const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
 
 const dynamoDb = new AWS.DynamoDB({apiVersion: '2012-08-10'});

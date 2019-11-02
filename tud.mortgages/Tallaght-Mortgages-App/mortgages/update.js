@@ -3,34 +3,82 @@
 //const uuid = require('uuid');
 const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
+const dynamoDb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 exports.update = async (event, context) => {
   const timestamp = new Date().getTime();
-  const newMortgage = JSON.parse(event.body);
-  if (typeof newMortgage.mortgageId !== 'string' || newMortgage.mortgageId == null ||
-        typeof newMortgage.firstName !== 'string' || newMortgage.firstName == null ||
-        typeof newMortgage.lastName !== 'string' || newMortgage.lastName == null ||
-        typeof newMortgage.currentAddress1 !== 'string' || newMortgage.currentAddress1 == null ||
-        typeof newMortgage.currentAddress2 !== 'string' || newMortgage.currentAddress2 == null ||
-        typeof newMortgage.loanAmount !== 'number' || newMortgage.loanAmount == null ||
-        typeof newMortgage.yearsInEmployment !== 'number' || newMortgage.yearsInEmployment == null ||
-        typeof newMortgage.salary !== 'number' || newMortgage.salary == null ||
-        typeof newMortgage.employerName !== 'string' || newMortgage.employerName == null
+
+  const mortgageId = event.pathParameters.id;
+
+  const mortgageRequest = JSON.parse(event.body);
+  if (typeof mortgageRequest.loanAmount !== 'string' || mortgageRequest.loanAmount == null ||
+        typeof mortgageRequest.yearsInEmployment !== 'string' || mortgageRequest.yearsInEmployment == null ||
+        typeof mortgageRequest.salary !== 'string' || mortgageRequest.salary == null ||
+        typeof mortgageRequest.employerName !== 'string' || mortgageRequest.employerName == null ||
+        typeof mortgageRequest.term !== 'string' || mortgageRequest.term == null ||
+        typeof mortgageRequest.mortgageStatus !== 'string' || mortgageRequest.mortgageStatus == null
   ) {
     console.error('Validation Failed');
     const errorResponse = {
       statusCode: 400,
       headers: { 'Content-Type': 'text/plain' },
-      body: 'Couldn\'t update the mortgage application.',
+      body: 'Validation. Parameter types. Couldn\'t update the mortgage application.',
     };
     return errorResponse;
   }
 
-  // create a response
-  const response = {
-    statusCode: 200,
-    body: "Employer is " + newMortgage.employerName//JSON.stringify(params.Item),
-  };
-  return response;
+  try {
+    
+    var newMortgage = {
+     TableName: "MORTGAGES_TABLE",
+      Key: {
+       "mortgageId": {
+         S: mortgageId
+        }
+      },
+      ExpressionAttributeNames: {
+        "#A": "loanAmount",
+        "#B": "yearsInEmployment",
+        "#C": "salary",
+        "#D": "employerName",
+        "#E": "term",
+        "#F": "mortgageStatus"
+      }, 
+      UpdateExpression: "set #A = :a, #B = :b, #C = :c, #D = :d, #E = :e, #F = :f",
+      ExpressionAttributeValues: {
+        ":a": { "N": mortgageRequest.loanAmount },
+        ":b": { "N": mortgageRequest.yearsInEmployment },
+        ":c": { "N": mortgageRequest.salary },
+        ":d": { "S": mortgageRequest.employerName },
+        ":e": { "N": mortgageRequest.term },
+        ":f": { "S": mortgageRequest.mortgageStatus }
+        
+      },
+      ReturnValues: "ALL_NEW"
+    };
+
+    const updatedMortgageResponse = await dynamoDb.updateItem(newMortgage).promise();
+    const updatedMortgage = convertMortgageItemToHttpAPI(updatedMortgageResponse.Attributes);
+    return { statusCode: 200, body: JSON.stringify(updatedMortgage) };
+    
+  } catch (error) {
+    return {
+      statusCode: 400,
+      error: `Could not update the Mortgage: ${error.stack}`
+    };
+  }
+};
+
+function convertMortgageItemToHttpAPI(mortgageItem) {
+  let foundMortgage = {};
+
+  foundMortgage.mortgageId = mortgageItem.mortgageId.S;
+  foundMortgage.customerId = mortgageItem.customerId.S;
+  foundMortgage.term = mortgageItem.term.N;
+  foundMortgage.loanAmount = mortgageItem.loanAmount.N;
+  foundMortgage.salary = mortgageItem.salary.N;
+  foundMortgage.employerName = mortgageItem.employerName.S;
+  foundMortgage.yearsInEmployment = mortgageItem.yearsInEmployment.N;                
+  foundMortgage.mortgageStatus = mortgageItem.mortgageStatus.S;
+  return foundMortgage;
 };
