@@ -7,18 +7,11 @@ const dynamoDb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 // var exports = module.exports = {};
 
 exports.getCustomer = async function (customerId) {
-   /* return {
-        firstName: "Alna",
-        lastName: "Duffin"
 
-    };*/
-    //try {
-        //const customerId = event.pathParameters.id;
-
+    try {
         var findCustomer = {
             Key: {
              "customerId": {
-               //S: event.pathParameters.id
                S: customerId
               }
             },
@@ -26,16 +19,18 @@ exports.getCustomer = async function (customerId) {
           };
       
           const findCustomerResponse = await dynamoDb.getItem(findCustomer).promise();
+
+          if (Object.entries(findCustomerResponse).length === 0 && findCustomerResponse.constructor === Object) {
+              return null;
+          }
+          
           let foundCustomer = convertCustomerItemToHttpAPI(findCustomerResponse.Item)
-          console.log(foundCustomer);
-          //return { statusCode: 200, body: JSON.stringify(foundCustomer) };
           return foundCustomer;
-    //} catch (error) {
-      /*  return {
-            statusCode: 400,
-            error: `Could not find the Customer: ${error.stack}`
-        };
-    }*/
+
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
 };
 
 function convertCustomerItemToHttpAPI(customerItem) {
