@@ -1,13 +1,13 @@
 'use strict';
 
 const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
-const customerModule = require("./dao/getCustomer.js")
+const customerDAO = require("./dao/customer.js")
 
 exports.get = async (event, context) => {
     
     const customerId = event.pathParameters.id;
     try {
-        const foundCustomer = await customerModule.getCustomer(customerId);
+        const foundCustomer = await customerDAO.findCustomerByPK(customerId);
         if (foundCustomer == null) {
             return {
               statusCode: 400,

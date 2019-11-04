@@ -6,7 +6,7 @@ const dynamoDb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 // var exports = module.exports = {};
 
-exports.getCustomer = async function (customerId) {
+exports.findCustomerByPK = async function (customerId) {
 
     try {
         var findCustomer = {

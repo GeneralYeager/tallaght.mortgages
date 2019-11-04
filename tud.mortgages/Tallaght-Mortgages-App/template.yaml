@@ -131,6 +131,23 @@ Resources:
             Path: /mortgage/
             Method: GET
 
+  # WORKFLOW APIS
+  WorkflowGetMortgageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: stepfunctions/mortgages/findByPK.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+
+  WorkflowGetCustomerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: stepfunctions/customers/findByPK.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+
 
 Outputs:
   MortgageApi:
