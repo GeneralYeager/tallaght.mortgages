@@ -1,14 +1,13 @@
 'use strict';
 
-
-
 const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
-
-const dynamoDb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+const customerModule = require("./dao/getCustomer.js")
+//const dynamoDb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 exports.get = async (event, context) => {
+    
 
-    try {
+  /*  try {
         const customerId = event.pathParameters.id;
 
         var findCustomer = {
@@ -29,20 +28,17 @@ exports.get = async (event, context) => {
             statusCode: 400,
             error: `Could not find the Customer: ${error.stack}`
         };
+    }*/
+
+    
+    try {
+        const foundCustomer = customerModule.getCustomer(event.pathParameters.id);
+
+        return { statusCode: 200, body: JSON.stringify(foundCustomer) };
+    } catch (error) {
+        return {
+            statusCode: 400,
+            error: `Could not find the Customer: ${error.stack}`
+        };
     }
-};
-
-function convertCustomerItemToHttpAPI(customerItem) {
-    let foundCustomer = {};
-
-    foundCustomer.lastName = customerItem.lastName.S;
-    foundCustomer.dob = customerItem.dob.S;
-    foundCustomer.currentAddress2 = customerItem.currentAddress2.S;
-    foundCustomer.currentAddress1 = customerItem.currentAddress1.S;
-    foundCustomer.firstName = customerItem.firstName.S;
-    foundCustomer.gender = customerItem.gender.S;
-    foundCustomer.customerId = customerItem.customerId.S;
-    foundCustomer.dob = customerItem.dob.S;                
-  
-    return foundCustomer;
 };
