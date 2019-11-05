@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters: 
+  DeploymentStage: 
+    Type: String
+    Default: "DEV"
+
+
+Resources:
+    UnderwriterSNSTopic:
+        Type: AWS::SNS::Topic
+        Properties: 
+            DisplayName: UnderwriterSNSTopic
+            Subscription: 
+                - Endpoint: appduffin@gmail.com
+                  Protocol: email
+            TopicName: UnderwriterSNSTopic
+    BrokerSNSTopic:
+        Type: AWS::SNS::Topic
+        Properties: 
+            DisplayName: BrokerSNSTopic
+            Subscription: 
+                - Endpoint: appduffin@gmail.com
+                  Protocol: email
+            TopicName: BrokerSNSTopic
+       

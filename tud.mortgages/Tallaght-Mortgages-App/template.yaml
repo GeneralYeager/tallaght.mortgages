@@ -15,6 +15,23 @@ Parameters:
 
 Resources:
 
+  UnderwriterSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      DisplayName: UnderwriterSNSTopic
+      Subscription: 
+        - Endpoint: appduffin@gmail.com
+          Protocol: email
+      TopicName: UnderwriterSNSTopic
+  BrokerSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      DisplayName: BrokerSNSTopic
+      Subscription: 
+        - Endpoint: appduffin@gmail.com
+          Protocol: email
+      TopicName: BrokerSNSTopic
+
   # CUSTOMER APIS
   GetCustomerFunction:
     Type: AWS::Serverless::Function
@@ -132,10 +149,25 @@ Resources:
             Method: GET
 
   # WORKFLOW APIS
-  WorkflowGetMortgageFunction:
+  MortgageSNSFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: stepfunctions/mortgages/findByPK.handler
+      Handler: stepfunctions/notifications/mortgageStatus.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+      Environment:
+        Variables:
+          UNDERWRITER_TOPIC_ARN: !Ref UnderwriterSNSTopic
+          BROKER_TOPIC_ARN: !Ref BrokerSNSTopic
+    DependsOn:
+      - UnderwriterSNSTopic
+      - BrokerSNSTopic
+
+  WorkflowGetCustomerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: stepfunctions/customers/findByPK.handler
       Runtime: nodejs10.x
       Role: 
         Ref: LambdaRoleParameter
@@ -147,7 +179,6 @@ Resources:
       Runtime: nodejs10.x
       Role: 
         Ref: LambdaRoleParameter
-
 
 Outputs:
   MortgageApi:
