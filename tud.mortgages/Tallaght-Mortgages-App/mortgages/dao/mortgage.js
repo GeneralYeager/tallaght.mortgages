@@ -31,6 +31,45 @@ exports.findMortgageByPK = async function (mortgageId) {
     }
 };
 
+exports.updateMortgage = async function (mortgage) {
+
+  try {
+    var newMortgage = {
+      TableName: "MORTGAGES_TABLE",
+      Key: {
+        "mortgageId": {
+          S: mortgage.mortgageId
+        }
+      },
+      ExpressionAttributeNames: {
+        "#A": "loanAmount",
+        "#B": "yearsInEmployment",
+        "#C": "salary",
+        "#D": "employerName",
+        "#E": "term",
+        "#F": "mortgageStatus"
+      }, 
+      UpdateExpression: "set #A = :a, #B = :b, #C = :c, #D = :d, #E = :e, #F = :f",
+      ExpressionAttributeValues: {
+        ":a": { "N": mortgage.loanAmount },
+        ":b": { "N": mortgage.yearsInEmployment },
+        ":c": { "N": mortgage.salary },
+        ":d": { "S": mortgage.employerName },
+        ":e": { "N": mortgage.term },
+        ":f": { "S": mortgage.mortgageStatus }   
+      },
+      ReturnValues: "ALL_NEW"
+    };
+ 
+     const updatedMortgageResponse = await dynamoDb.updateItem(newMortgage).promise();
+     const updatedMortgage = convertMortgageItemToHttpAPI(updatedMortgageResponse.Attributes);
+     return updatedMortgage;
+  } catch (error) {
+      console.log(error);
+      return null;
+  }
+};
+
 function convertMortgageItemToHttpAPI(mortgageItem) {
     let foundMortgage = {};
 

@@ -183,6 +183,13 @@ Resources:
       Runtime: nodejs10.x
       Role: 
         Ref: LambdaRoleParameter
+  WorkflowUpdateMorgtageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: stepfunctions/mortgages/updateMortgage.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
   StartWorkflowFunction:
     Type: AWS::Serverless::Function
     Properties:
