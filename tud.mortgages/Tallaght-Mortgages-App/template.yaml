@@ -12,7 +12,13 @@ Parameters:
     Type: String
     Default: "arn:aws:iam::727432808710:role/TUD.Mortgage.Lambda.Role"
     Description: Enter the ARN of an applicable IAM Role for the Lambda Functions
+  StepFunctionArnParameter: 
+    Type: String
+    Default: "arn:aws:states:eu-west-1:727432808710:stateMachine:MortgageApprovalWorkflow"
+    Description: Enter the ARN of the Workflow Step Function State Machine
 
+
+    
 Resources:
 
   UnderwriterSNSTopic:
@@ -163,7 +169,6 @@ Resources:
     DependsOn:
       - UnderwriterSNSTopic
       - BrokerSNSTopic
-
   WorkflowGetCustomerFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -171,14 +176,31 @@ Resources:
       Runtime: nodejs10.x
       Role: 
         Ref: LambdaRoleParameter
-
-  WorkflowGetCustomerFunction:
+  WorkflowGetMorgtageFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: stepfunctions/customers/findByPK.handler
+      Handler: stepfunctions/mortgages/findByPK.handler
       Runtime: nodejs10.x
       Role: 
         Ref: LambdaRoleParameter
+  StartWorkflowFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: stepfunctions/startWorkflow.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+      Environment:
+        Variables:
+          MORTGAGE_WORKFLOW_ARN: !Ref StepFunctionArnParameter
+      Events:
+        StartWorkflowEvent:
+          Type: Api
+          Properties:
+            Path: /workflow/
+            Method: POST
+
+            
 
 Outputs:
   MortgageApi:
