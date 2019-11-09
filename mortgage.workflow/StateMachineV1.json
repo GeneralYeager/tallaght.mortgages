@@ -1,71 +1,38 @@
 {
-  "StartAt": "AutoAssessment",
-  "States": {
-    "AutoAssessment": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke",
-      "Next": "AutoAssessmentResult"
-    },
-    "AutoAssessmentResult": {
-      "Type": "Choice",
-      "Choices": [{
-        "Not": {
-          "Variable": "$.assessmentResult",
-          "StringEquals": "Passed"
-        },
-        "Next": "ApproveApplication"
-       }],
-      "Default": "AutoAssessmentFailed"
-    },
-    "AutoAssessmentFailed": {
-      "Type": "Pass",
-      "Next": "NotifyUnderwriter"
-    }, 
-    "NotifyUnderwriter": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda::::invoke",
-      "Next": "WaitForUnderwritingDecision"
-    }, 
-    "WaitForUnderwritingDecision": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
-      "Next": "ActionUnderwriterDecision"
-    }, 
-    "ActionUnderwriterDecision": {
-      "Type": "Choice",
-      "Choices": [{
-          "Variable": "$.underwriterDecision",
-          "StringEquals": "Approved",
-          "Next": "ApproveApplication"
-        }, {
-          "Variable": "$.underwriterDecision",
-          "StringEquals": "Rejected",
-          "Next": "RejectApplication"
-        }, {
-          "Variable": "$.underwriterDecision",
-          "StringEquals": "Clarification",
-          "Next": "RequestClarification"
-       }]
-    },
-    "RequestClarification": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda::::invoke",
-      "Next": "WaitForClarification"
-    }, 
-    "WaitForClarification": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
-      "Next": "AutoAssessment"
-    },
-    "RejectApplication": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda::::invoke",
-      "End": true
-    },
-    "ApproveApplication": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda::::invoke",
-      "End": true
-    }
-  }
+	"StartAt": "GetMortgageApplication",
+	"States": {
+	
+		"GetMortgageApplication": {
+			"Type": "Task",
+			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-WorkflowGetMorgtageFunction-16L3UM67HNU4N",
+			"Next": "GetMortgageApplicationResult"
+		},
+	
+		"GetMortgageApplicationResult": {
+			"Type": "Choice",
+			"Choices": [{
+				"Variable": "$.statusCode",
+				"NumericEquals": 200,
+				"Next": "AutoAssessment"
+			}],
+			"Default": "MortgageApplicationNotFound"
+		},
+
+		"MortgageApplicationNotFound": {
+			"Type": "Task",
+			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-NofifyUsersSNSFunction-216EXFJBHO0V",
+			"Parameters": {
+				"TopicArn": "arn:aws:sns:eu-west-1:727432808710:BrokerSNSTopic",
+				"Message.$": "$.error"
+			},
+			"End": true
+		},
+
+		"AutoAssessment": {
+			"Type": "Task",
+			"InputPath": "$.mortgage",
+			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-AutoAssessmentFunction-1FH398K5IHYU7",
+			"End": true
+		}
+	}
 }

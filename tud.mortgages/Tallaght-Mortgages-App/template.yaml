@@ -221,7 +221,13 @@ Resources:
           Properties:
             Path: /workflow/
             Method: POST
-
+  AutoAssessmentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: workflow/autoassessment.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
             
 
 Outputs:
