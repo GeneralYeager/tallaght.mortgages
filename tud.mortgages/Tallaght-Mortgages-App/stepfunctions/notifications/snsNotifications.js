@@ -9,13 +9,6 @@ exports.handler = async (event, context) => {
 
     let params = event;
     try {
-        // Create publish parameters
-       /* var params = {
-            Message: `Mortgage ${event.mortgageId} is now in status ${event.status}`,
-            TopicArn: topicArn
-        };
-        */
-
         // Create promise and SNS service object
         var data = await snsModule.publish(params).promise();
         console.log(`Message ${params.Message} send sent to the topic ${params.TopicArn}`);

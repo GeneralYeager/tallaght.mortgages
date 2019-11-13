@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-
+import  {MatToolbarModule } from '@angular/material/toolbar';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -7,5 +8,28 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'Tallaght Mortgages Broker Web Application';
+
+  
+ // navLinks: any[];
+  //activeLinkIndex = -1; 
+
+  constructor(private router: Router) {
+    /*this.navLinks = [
+        {
+            label: 'Brokers',
+            link: './brokerView',
+            index: 0
+        }, {
+            label: 'Underwriters',
+            link: './underwriterView',
+            index: 1
+        }
+    ];*/
+  }
+
+  ngOnInit(): void {
+    /*this.router.events.subscribe((res) => {
+      this.activeLinkIndex = this.navLinks.indexOf(this.navLinks.find(tab => tab.link === '.' + this.router.url));
+    });*/
+  }
 }

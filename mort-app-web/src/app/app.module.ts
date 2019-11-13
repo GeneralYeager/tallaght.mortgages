@@ -7,7 +7,11 @@ import { UnderwriterComponentComponent } from './underwriter-component/underwrit
 import { BrokerComponentComponent } from './broker-component/broker-component.component';
 import { HomeComponent } from './home/home.component';
 
+import {MatToolbarModule} from '@angular/material/toolbar';
+import {MatTabsModule} from '@angular/material/tabs';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
+import { MatTableModule } from '@angular/material/table'
 
 @NgModule({
   declarations: [
@@ -18,7 +22,11 @@ import { HomeComponent } from './home/home.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    MatToolbarModule,
+    MatTabsModule,
+    MatTableModule
   ],
   providers: [],
   bootstrap: [AppComponent]

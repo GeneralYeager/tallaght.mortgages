@@ -1,4 +1,4 @@
-<nav>
-    <a routerLink="/underwriterView" routerLinkActive="active">Underwriters</a>
-    <a routerLink="/brokerView" routerLinkActive="active">Brokers</a>
-  </nav>
+<h1>{{title}}</h1>
+
+<button mat-button (click)="goToBrokerPage($event)">Brokers</button>
+<button mat-button (click)="goToUnderwriterPage($event)">Underwriters</button>
