@@ -13,6 +13,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import { MatTableModule } from '@angular/material/table'
 
+import { AlertModule } from './_alert';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -26,7 +28,8 @@ import { MatTableModule } from '@angular/material/table'
     BrowserAnimationsModule,
     MatToolbarModule,
     MatTabsModule,
-    MatTableModule
+    MatTableModule,
+    AlertModule
   ],
   providers: [],
   bootstrap: [AppComponent]
