@@ -16,11 +16,14 @@ Parameters:
     Type: String
     Default: "arn:aws:states:eu-west-1:727432808710:stateMachine:MortgageApprovalWorkflow"
     Description: Enter the ARN of the Workflow Step Function State Machine
-
+  WebsocketConnectionTableName:
+    Type: String
+    Default: 'WEBSOCKET_CONNECTIONS_TABLE'
 
     
 Resources:
 
+  # SNS TOPICS
   UnderwriterSNSTopic:
     Type: AWS::SNS::Topic
     Properties: 
@@ -228,7 +231,186 @@ Resources:
       Runtime: nodejs10.x
       Role: 
         Ref: LambdaRoleParameter
-            
+
+
+
+  # WEBSOCKET APIS
+  MortgageWebSocket:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: MortgageWebSocket
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.message"
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref MortgageWebSocket
+      RouteKey: $connect
+      AuthorizationType: NONE
+      OperationName: ConnectRoute
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref MortgateConnectionIntegration
+  MortgateConnectionIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref MortgageWebSocket
+      Description: Connect Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: 
+        Fn::Sub:
+            arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WebSocketConnectFunction.Arn}/invocations
+  DisconnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref MortgageWebSocket
+      RouteKey: $disconnect
+      AuthorizationType: NONE
+      OperationName: DisconnectRoute
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref MortgateDisconnectInteg
+  MortgateDisconnectInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref MortgageWebSocket
+      Description: Disconnect Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: 
+        Fn::Sub:
+            arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WebSocketDisconnectFunction.Arn}/invocations
+  SendRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref MortgageWebSocket
+      RouteKey: sendmessage
+      AuthorizationType: NONE
+      OperationName: SendRoute
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref SendInteg
+  SendInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref MortgageWebSocket
+      Description: Send Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: 
+        Fn::Sub:
+            arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WebSocketSendFunction.Arn}/invocations
+  Deployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+    - ConnectRoute
+    - SendRoute
+    - DisconnectRoute
+    Properties:
+      ApiId: !Ref MortgageWebSocket
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: Prod
+      Description: Prod Stage
+      DeploymentId: !Ref Deployment
+      ApiId: !Ref MortgageWebSocket
+
+
+  # WEBSOCKET DYNAMO DB TABLE
+  WebsocketConnectionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: "connectionId"
+        AttributeType: "S"
+      KeySchema:
+      - AttributeName: "connectionId"
+        KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      SSESpecification:
+        SSEEnabled: True
+      TableName: !Ref WebsocketConnectionTableName
+
+  # WEBSOCKET LAMBDA API
+  WebSocketConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: websockets/onconnect/
+      Handler: app.handler
+      MemorySize: 256
+      Runtime: nodejs10.x
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref WebsocketConnectionTableName
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref WebsocketConnectionTableName
+  OnConnectPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - MortgageWebSocket
+      - WebSocketConnectFunction
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref WebSocketConnectFunction
+      Principal: apigateway.amazonaws.com
+  WebSocketDisconnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: websockets/ondisconnect/
+      Handler: app.handler
+      MemorySize: 256
+      Runtime: nodejs10.x
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref WebsocketConnectionTableName
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref WebsocketConnectionTableName
+  OnDisconnectPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - MortgageWebSocket
+      - WebSocketDisconnectFunction
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref WebSocketDisconnectFunction
+      Principal: apigateway.amazonaws.com
+  WebSocketSendFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: websockets/sendmessage/
+      Handler: app.handler
+      MemorySize: 256
+      Runtime: nodejs10.x
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref WebsocketConnectionTableName
+        # WEBSOCKET_ENDPOINT: !Join [ '', [ 'wss://', !Ref MortgageWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
+          WEBSOCKET_ENDPOINT: !Join [ '', [ 'wss://', !Ref MortgageWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/Prod'] ]
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref WebsocketConnectionTableName
+      - Statement:
+        - Effect: Allow
+          Action:
+          - 'execute-api:ManageConnections'
+          Resource:
+          - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${MortgageWebSocket}/*'
+  WebSocketSendPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - MortgageWebSocket
+      - WebSocketSendFunction
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref WebSocketSendFunction
+      Principal: apigateway.amazonaws.com
+
 
 Outputs:
   MortgageApi:
@@ -258,3 +440,24 @@ Outputs:
 #  ListByStatusMortgageFunction:
  #   Description: "ListByStatusMortgageFunctionARN"
  #   Value: !GetAtt ListByStatusMortgageFunction.Arn
+
+  # WEBSOCKET OUTPUTS
+  ConnectionsTableArn:
+    Description: "Websocket Connections table ARN"
+    Value: !GetAtt WebsocketConnectionsTable.Arn
+
+  WebSocketConnectFunctionArn:
+    Description: "Websocket OnConnect function ARN"
+    Value: !GetAtt WebSocketConnectFunction.Arn
+
+  WebSocketDisconnectFunctionArn:
+    Description: "Websocket OnDisconnect function ARN"
+    Value: !GetAtt WebSocketDisconnectFunction.Arn
+
+  WebSocketSendFunctionArn:
+    Description: "Websocket SendMessage function ARN"
+    Value: !GetAtt WebSocketSendFunction.Arn
+
+  WebSocketURI:
+    Description: "Websocket WSS Protocol URI"
+    Value: !Join [ '', [ 'wss://', !Ref MortgageWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
