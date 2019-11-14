@@ -17,8 +17,8 @@ exports.create = async (event, context) => {
     console.error('Customer Create Validation Failed');
     const errorResponse = {
       statusCode: 400,
-      headers: { 'Content-Type': 'text/plain' },
-      body: 'Couldn\'t create the new Customer.',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify( { error : 'Couldn\'t create the new Customer. Not all required attributes were provided.' } )
     };
     return errorResponse;
   }
@@ -76,8 +76,9 @@ exports.create = async (event, context) => {
     
   } catch (error) {
     return {
-      statusCode: 400,
-      error: `Could not obtain new Customer ID: ${error.stack}`
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify( { error : `Could not obtain new Customer ID: ${error.stack}` } )
     };
   }
 };

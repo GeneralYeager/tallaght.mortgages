@@ -19,8 +19,8 @@ exports.create = async (event, context) => {
     console.error('Validation Failed');
     const errorResponse = {
       statusCode: 400,
-      headers: { 'Content-Type': 'text/plain' },
-      body: 'Validation. Parameter types. Couldn\'t create the mortgage application.',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify( { error : `Incomplete/Invalid Parameters. Couldn\'t create the mortgage application.` } )    
     };
     return errorResponse;
   }
@@ -83,8 +83,9 @@ exports.create = async (event, context) => {
     
   } catch (error) {
     return {
-      statusCode: 400,
-      error: `Could not obtain new Mortgage ID: ${error.stack}`
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify( { error : `Could not obtain new Mortgage ID: ${error.stack}` } )
     };
   }
 };

@@ -22,8 +22,8 @@ exports.update = async (event, context) => {
     console.error('Validation Failed');
     const errorResponse = {
       statusCode: 400,
-      headers: { 'Content-Type': 'text/plain' },
-      body: 'Validation. Parameter types. Couldn\'t update the mortgage application.',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify( { error : `Validation. Parameter types. Couldn\'t update the mortgage application.` } )
     };
     return errorResponse;
   }
@@ -34,7 +34,8 @@ exports.update = async (event, context) => {
       if (foundMortgage == null) {
           return {
               statusCode: 400,
-              error: `Could not update the Mortgage: ${mortgageId}`
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify( { error : `Could not update the Mortgage: ${mortgageId}.` } )
           };
       }
 
@@ -44,8 +45,9 @@ exports.update = async (event, context) => {
       };
   } catch (error) {
       return {
-          statusCode: 400,
-          error: `Could not update the Mortgage: ${error.stack}`
+          statusCode: 500,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify( { error : `Could not update the Mortgage: ${mortgageId}. Error [${error.stack}].` } )
       };
   }
 };

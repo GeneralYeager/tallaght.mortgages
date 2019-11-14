@@ -21,9 +21,8 @@ exports.update = async (event, context) => {
     console.error('Customer Update Validation Failed');
     const errorResponse = {
       statusCode: 400,
-      headers: { 'Content-Type': 'text/plain' },
-      body: 'Couldn\'t update the new Customer.',
-    };
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify( { error : `Could not update the Customer: ${customerId}. Incomplete information was provided.` } )   };
     return errorResponse;
   }
 
@@ -63,7 +62,8 @@ exports.update = async (event, context) => {
   } catch (error) {
     return {
       statusCode: 400,
-      error: `Could not update the Customer: ${error.stack}`
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify( { error : `Could not update the Customer: ${customerId}. Error [${error.stack}].` } )
     };
   }
 };

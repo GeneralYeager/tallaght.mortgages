@@ -7,41 +7,52 @@ var dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 exports.list = async (event, context) => {
 
-  if (event.queryStringParameters === 'undefined' || event.queryStringParameters == null) {
-    console.error('Validation Failed');
-    const errorResponse = {
-      statusCode: 400,
-      headers: { 'Content-Type': 'text/plain' },
-      body: 'Validation. There must be a query string containing the required mortgage status.',
-    };
-    return errorResponse;
-  }
-
-  const listStatus = event.queryStringParameters.status;
-
-  console.log("request: " + JSON.stringify(event.queryStringParameters));
-
-
   try {
-    var findMortgage = {
-        TableName: "MORTGAGES_TABLE",
-        IndexName: "MortgateStatusIndex",
-        KeyConditionExpression: 'mortgageStatus = :statusCode',
-        ExpressionAttributeValues: { ':statusCode': listStatus } 
+    if (event.queryStringParameters === 'undefined' || event.queryStringParameters == null) {
+  /*    console.error('Validation Failed');
+      const errorResponse = {
+        statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify( { error : `Validation. There must be a query string containing the required mortgage status.` } )
       };
-  
-      const findMortgageResponse = await dynamoDb.query(findMortgage).promise();
-   //   let foundMortgage = convertMortgageItemToHttpAPI(findMortgageResponse.Item)
+      return errorResponse;*/
+      var findAllMortgages = {
+        TableName: "MORTGAGES_TABLE",
+      };
+      
+      const findMortgageResponse = await dynamoDb.scan(findAllMortgages).promise();
       console.log(findMortgageResponse);
       return { 
         statusCode: 200, 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(findMortgageResponse.Items) 
       };
+
+    } else {
+      const listStatus = event.queryStringParameters.status;
+
+      console.log("request: " + JSON.stringify(event.queryStringParameters));
+      var findMortgage = {
+        TableName: "MORTGAGES_TABLE",
+        IndexName: "MortgateStatusIndex",
+        KeyConditionExpression: 'mortgageStatus = :statusCode',
+        ExpressionAttributeValues: { ':statusCode': listStatus } 
+      };
+    
+      const findMortgageResponse = await dynamoDb.query(findMortgage).promise();
+      //   let foundMortgage = convertMortgageItemToHttpAPI(findMortgageResponse.Item)
+      console.log(findMortgageResponse);
+      return { 
+        statusCode: 200, 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(findMortgageResponse.Items) 
+      };
+    }
 } catch (error) {
     return {
-        statusCode: 400,
-        error: `Could not find the Mortgage: ${error.stack}`
+        statusCode: 500,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify( { error : `Could not find the Mortgages. Error [${error.stack}].` } )
     };
 }
 };

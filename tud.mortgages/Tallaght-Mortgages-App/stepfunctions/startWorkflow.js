@@ -20,12 +20,14 @@ exports.handler = async (event, context) => {
         const workflowExecution = await stepfunctions.startExecution(params).promise();
         return {
             statusCode: 200,
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(workflowExecution)
         };
     } catch (error) {
         return {
-            statusCode: 400,
-            error: `Could not find the Mortgage: ${error.stack}`
+            statusCode: 500,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify( { error : `Could not start the Workflow execution: ${error.stack}` } )
         };
     }
 };

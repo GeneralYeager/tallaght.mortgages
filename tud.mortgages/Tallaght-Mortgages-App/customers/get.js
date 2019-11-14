@@ -11,18 +11,21 @@ exports.get = async (event, context) => {
         if (foundCustomer == null) {
             return {
               statusCode: 400,
-                error: `Could not find the Customer: ${customerId}`
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify( { error : `Could not find the Customer: ${customerId}` } )
             };
         }
 
         return { 
             statusCode: 200, 
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(foundCustomer) 
         };
     } catch (error) {
         return {
-            statusCode: 400,
-            error: `Could not find the Customer: ${error.stack}`
+            statusCode: 500,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify( { error : `Could not find the Customer: ${error.stack}` } )
         };
     }
 };
