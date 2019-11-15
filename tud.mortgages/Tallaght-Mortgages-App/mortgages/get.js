@@ -11,19 +11,20 @@ exports.get = async (event, context) => {
         if (foundMortgage == null) {
             return {
                 statusCode: 400,
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
                 body: JSON.stringify( { error : `Could not find the Mortgage: ${mortgageId}` } )
             };
         }
 
         return { 
-            statusCode: 200, 
+            statusCode: 200,
+            headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" }, 
             body: JSON.stringify(foundMortgage) 
         };
     } catch (error) {
         return {
             statusCode: 500,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
             body: JSON.stringify( { error : `Could not find the Mortgage: ${mortgageId}. Error [${error.stack}].` } )
         };
     }

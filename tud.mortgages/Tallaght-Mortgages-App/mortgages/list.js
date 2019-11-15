@@ -24,7 +24,7 @@ exports.list = async (event, context) => {
       console.log(findMortgageResponse);
       return { 
         statusCode: 200, 
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify(findMortgageResponse.Items) 
       };
 
@@ -44,14 +44,14 @@ exports.list = async (event, context) => {
       console.log(findMortgageResponse);
       return { 
         statusCode: 200, 
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify(findMortgageResponse.Items) 
       };
     }
 } catch (error) {
     return {
         statusCode: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify( { error : `Could not find the Mortgages. Error [${error.stack}].` } )
     };
 }

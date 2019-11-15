@@ -21,7 +21,7 @@ exports.update = async (event, context) => {
     console.error('Customer Update Validation Failed');
     const errorResponse = {
       statusCode: 400,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify( { error : `Could not update the Customer: ${customerId}. Incomplete information was provided.` } )   };
     return errorResponse;
   }
@@ -57,12 +57,16 @@ exports.update = async (event, context) => {
 
     const updatedCustomerResponse = await dynamoDb.updateItem(newCustomer).promise();
     const updatedCustomer = convertCustomerItemToHttpAPI(updatedCustomerResponse.Attributes);
-    return { statusCode: 200, body: JSON.stringify(updatedCustomer) };
+    return { 
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify(updatedCustomer)
+    };
     
   } catch (error) {
     return {
       statusCode: 400,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify( { error : `Could not update the Customer: ${customerId}. Error [${error.stack}].` } )
     };
   }

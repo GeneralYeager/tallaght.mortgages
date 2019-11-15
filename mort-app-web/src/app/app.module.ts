@@ -15,6 +15,8 @@ import { MatTableModule } from '@angular/material/table'
 
 import { AlertModule } from './_alert';
 
+import { HttpClientModule } from '@angular/common/http';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -24,6 +26,7 @@ import { AlertModule } from './_alert';
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatToolbarModule,
@@ -31,7 +34,7 @@ import { AlertModule } from './_alert';
     MatTableModule,
     AlertModule
   ],
-  providers: [],
+  providers: [HttpClientModule],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

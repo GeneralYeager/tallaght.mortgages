@@ -19,7 +19,7 @@ exports.create = async (event, context) => {
     console.error('Validation Failed');
     const errorResponse = {
       statusCode: 400,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify( { error : `Incomplete/Invalid Parameters. Couldn\'t create the mortgage application.` } )    
     };
     return errorResponse;
@@ -79,12 +79,16 @@ exports.create = async (event, context) => {
 
     const newMortgageResponse = await dynamoDb.putItem(newMortgage).promise();
     
-    return { statusCode: 200, body: JSON.stringify(newMortgageId) };
+    return { 
+      statusCode: 200, 
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify(newMortgageId) 
+    };
     
   } catch (error) {
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify( { error : `Could not obtain new Mortgage ID: ${error.stack}` } )
     };
   }
