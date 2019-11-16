@@ -397,7 +397,7 @@ Resources:
         Variables:
           TABLE_NAME: !Ref WebsocketConnectionTableName
         # WEBSOCKET_ENDPOINT: !Join [ '', [ 'wss://', !Ref MortgageWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
-          WEBSOCKET_ENDPOINT: !Join [ '', [ 'wss://', !Ref MortgageWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/Prod'] ]
+          WEBSOCKET_ENDPOINT: !Join [ '', [ !Ref MortgageWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/Prod'] ]
       Policies:
       - DynamoDBCrudPolicy:
           TableName: !Ref WebsocketConnectionTableName

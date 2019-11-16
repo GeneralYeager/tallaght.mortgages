@@ -9,6 +9,8 @@ import { retry, catchError } from 'rxjs/operators';
 })
 export class MortgageApiService {
 
+  private numRetries = 0;
+
   // Define API
   apiURL = 'https://14c5jip7sg.execute-api.eu-west-1.amazonaws.com/Prod';
 
@@ -32,7 +34,7 @@ export class MortgageApiService {
   getMortgages(): Observable<Mortgage[]> {
     return this.http.get<Mortgage[]>(this.apiURL + '/mortgage')
     .pipe(
-      retry(1),
+      retry(this.numRetries),
       catchError(this.handleError)
     )
   }
@@ -40,7 +42,7 @@ export class MortgageApiService {
   getMortgagesByStatus(statusCode): Observable<Mortgage[]> {
     return this.http.get<Mortgage[]>(this.apiURL + '/mortgage?status=' + statusCode)
     .pipe(
-      retry(1),
+      retry(this.numRetries),
       catchError(this.handleError)
     )
   }
@@ -49,25 +51,25 @@ export class MortgageApiService {
   getMortgage(id): Observable<Mortgage> {
     return this.http.get<Mortgage>(this.apiURL + '/mortgage/' + id)
     .pipe(
-      retry(1),
+      retry(this.numRetries),
       catchError(this.handleError)
     )
   } 
 
   // HttpClient API post() method
   createMortgage(mortgage): Observable<Mortgage> {
-    return this.http.post<Mortgage>(this.apiURL + '/mortgage', JSON.stringify(mortgage), this.httpOptions)
+    return this.http.put<Mortgage>(this.apiURL + '/mortgage', JSON.stringify(mortgage), this.httpOptions)
     .pipe(
-      retry(1),
+      retry(this.numRetries),
       catchError(this.handleError)
     )
   } 
 
   // HttpClient API put() method
   updateMortgage(id, mortgage): Observable<Mortgage> {
-    return this.http.put<Mortgage>(this.apiURL + '/mortgage/' + id, JSON.stringify(mortgage), this.httpOptions)
+    return this.http.post<Mortgage>(this.apiURL + '/mortgage/' + id, JSON.stringify(mortgage), this.httpOptions)
     .pipe(
-      retry(1),
+      retry(this.numRetries),
       catchError(this.handleError)
     )
   }
@@ -76,7 +78,7 @@ export class MortgageApiService {
   deleteMortgage(id){
     return this.http.delete<Mortgage>(this.apiURL + '/mortgage/' + id, this.httpOptions)
     .pipe(
-      retry(1),
+      retry(this.numRetries),
       catchError(this.handleError)
     )
   }

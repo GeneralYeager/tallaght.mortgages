@@ -16,13 +16,17 @@ import { MatTableModule } from '@angular/material/table'
 import { AlertModule } from './_alert';
 
 import { HttpClientModule } from '@angular/common/http';
-
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material';
+import { FormsModule } from '@angular/forms';
+import { NewmortgageComponent } from './newmortgage/newmortgage.component';
 @NgModule({
   declarations: [
     AppComponent,
     UnderwriterComponentComponent,
     BrokerComponentComponent,
-    HomeComponent
+    HomeComponent,
+    NewmortgageComponent
   ],
   imports: [
     BrowserModule,
@@ -32,7 +36,10 @@ import { HttpClientModule } from '@angular/common/http';
     MatToolbarModule,
     MatTabsModule,
     MatTableModule,
-    AlertModule
+    AlertModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule
   ],
   providers: [HttpClientModule],
   bootstrap: [AppComponent]

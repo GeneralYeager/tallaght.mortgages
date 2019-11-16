@@ -51,12 +51,12 @@ exports.updateMortgage = async function (mortgage) {
       }, 
       UpdateExpression: "set #A = :a, #B = :b, #C = :c, #D = :d, #E = :e, #F = :f",
       ExpressionAttributeValues: {
-        ":a": { "N": mortgage.loanAmount },
-        ":b": { "N": mortgage.yearsInEmployment },
-        ":c": { "N": mortgage.salary },
+        ":a": { "N": mortgage.loanAmount.toString() },
+        ":b": { "N": mortgage.yearsInEmployment.toString() },
+        ":c": { "N": mortgage.salary.toString() },
         ":d": { "S": mortgage.employerName },
-        ":e": { "N": mortgage.term },
-        ":f": { "S": mortgage.mortgageStatus }   
+        ":e": { "N": mortgage.term.toString() },
+        ":f": { "S": mortgage.mortgageStatus }    
       },
       ReturnValues: "ALL_NEW"
     };

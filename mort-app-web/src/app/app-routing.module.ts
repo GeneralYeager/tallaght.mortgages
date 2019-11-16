@@ -3,11 +3,13 @@ import { Routes, RouterModule } from '@angular/router';
 import { UnderwriterComponentComponent } from './underwriter-component/underwriter-component.component';
 import { BrokerComponentComponent } from './broker-component/broker-component.component';
 import { HomeComponent } from './home/home.component';
+import { NewmortgageComponent } from './newmortgage/newmortgage.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'underwriters', component: UnderwriterComponentComponent },
   { path: 'brokers', component: BrokerComponentComponent },
+  { path: 'brokers/newmortgage', component: NewmortgageComponent },
   { path: '**', redirectTo: '/home', pathMatch: 'full' }
 ];
 

@@ -1,0 +1,31 @@
+<h1>{{title}}</h1>
+
+<form class="example-form">
+    
+    <td><mat-form-field class="example-full-width">
+        <input matInput placeholder="Customer Number" [(ngModel)]="element.customerId" name="customerId">
+    </mat-form-field></td>
+
+    <table class="example-full-width" cellspacing="0"><tr>
+      <td><mat-form-field class="example-full-width">
+        <input matInput placeholder="Employers Name" [(ngModel)]="element.employerName" name="employerName">
+      </mat-form-field></td>
+      <td><mat-form-field class="example-full-width">
+        <input matInput placeholder="Years in Employments"  [(ngModel)]="element.yearsInEmployment" name="yearsInEmployment">
+      </mat-form-field></td>
+      <td><mat-form-field class="example-full-width">
+        <input matInput placeholder="Salary"  [(ngModel)]="element.salary" name="salary">
+      </mat-form-field></td>
+    </tr></table>
+  
+    
+    <table class="example-full-width" cellspacing="0"><tr>
+      <td><mat-form-field class="example-full-width">
+        <input matInput placeholder="Loan Amount" [(ngModel)]="element.loanAmount" name="loanAmount">
+      </mat-form-field></td>
+      <td><mat-form-field class="example-full-width">
+        <input matInput placeholder="Term (Years)" [(ngModel)]="element.term" name="term">
+      </mat-form-field></td>
+    </tr></table>
+    <a href="" class="button" mat-button (click)="createMortgage($event)">Create</a>
+  </form>
