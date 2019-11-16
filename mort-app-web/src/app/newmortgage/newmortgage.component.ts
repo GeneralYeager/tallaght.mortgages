@@ -22,7 +22,7 @@ export class NewmortgageComponent implements OnInit {
     console.log(this.element);
     this.mortgageApi.createMortgage(this.element).subscribe(data => {
       console.log(data);
-      this.router.navigate(['/home/brokers'])
+      this.router.navigate(['/brokers'])
     });
   }
 }

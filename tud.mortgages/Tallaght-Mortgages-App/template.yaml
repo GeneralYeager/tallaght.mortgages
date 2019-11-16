@@ -237,8 +237,20 @@ Resources:
       Runtime: nodejs10.x
       Role: 
         Ref: LambdaRoleParameter
-
-
+  ChangeMortgageStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: stepfunctions/mortgages/changeMortgageStatus.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+  MortgageStatusSNSFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: stepfunctions/notifications/mortgageStatusSend.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
 
   # WEBSOCKET APIS
   MortgageWebSocket:
@@ -396,7 +408,6 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref WebsocketConnectionTableName
-        # WEBSOCKET_ENDPOINT: !Join [ '', [ 'wss://', !Ref MortgageWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
           WEBSOCKET_ENDPOINT: !Join [ '', [ !Ref MortgageWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/Prod'] ]
       Policies:
       - DynamoDBCrudPolicy:
