@@ -24,6 +24,7 @@ export class UnderwriterNotificationsService {
     this.messages = <Subject<Message>>wsService.connect(CHAT_URL).pipe(
       map((response: MessageEvent): Message => {
         console.log(response);
+        console.log("in map");
         let data = JSON.parse(response.data);
         return {
           author: data.author,

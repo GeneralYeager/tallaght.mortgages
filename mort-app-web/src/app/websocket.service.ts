@@ -23,13 +23,19 @@ export class WebsocketService {
     let ws = new WebSocket(url);
     console.log("create ws");
     let observable = Observable.create((obs: Observer<MessageEvent>) => {
-      ws.onmessage = obs.next.bind(obs);
+      console.log("in obs");
+      //ws.onmessage = obs.next.bind(obs);
+      ws.onmessage = function(event) {
+        console.log("WebSocket message received:", event);
+        obs.next(event);
+      };
       ws.onerror = obs.error.bind(obs);
       ws.onclose = obs.complete.bind(obs);
       return ws.close.bind(ws);
     });
     let observer = {
       next: (data: Object) => {
+        console.log("in next");
         if (ws.readyState === WebSocket.OPEN) {
           ws.send(JSON.stringify(data));
         }

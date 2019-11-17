@@ -164,20 +164,6 @@ Resources:
             Method: GET
 
   # WORKFLOW APIS
-  MortgageSNSFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: stepfunctions/notifications/mortgageStatus.handler
-      Runtime: nodejs10.x
-      Role: 
-        Ref: LambdaRoleParameter
-      Environment:
-        Variables:
-          UNDERWRITER_TOPIC_ARN: !Ref UnderwriterSNSTopic
-          BROKER_TOPIC_ARN: !Ref BrokerSNSTopic
-    DependsOn:
-      - UnderwriterSNSTopic
-      - BrokerSNSTopic
   NofifyUsersSNSFunction:
     Type: AWS::Serverless::Function
     Properties:
