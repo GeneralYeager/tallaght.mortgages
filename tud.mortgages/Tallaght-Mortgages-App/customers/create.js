@@ -17,7 +17,7 @@ exports.create = async (event, context) => {
     console.error('Customer Create Validation Failed');
     const errorResponse = {
       statusCode: 400,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify( { error : 'Couldn\'t create the new Customer. Not all required attributes were provided.' } )
     };
     return errorResponse;
@@ -72,12 +72,15 @@ exports.create = async (event, context) => {
     };
 
     const newCustomerResponse = await dynamoDb.putItem(newCustomer).promise();
-    return { statusCode: 200, body: JSON.stringify(newCustomerId) };
+    return { 
+      statusCode: 200, 
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify(newCustomerId) };
     
   } catch (error) {
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify( { error : `Could not obtain new Customer ID: ${error.stack}` } )
     };
   }

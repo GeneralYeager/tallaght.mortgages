@@ -11,17 +11,14 @@ exports.update = async (event, context) => {
   const customerId = event.pathParameters.id;
 
   const customerRequest = JSON.parse(event.body);
-  if (typeof customerRequest.firstName !== 'string' || customerRequest.firstName == null ||
-        typeof customerRequest.lastName !== 'string' || customerRequest.lastName == null ||
-        typeof customerRequest.currentAddress1 !== 'string' || customerRequest.currentAddress1 == null ||
-        typeof customerRequest.currentAddress2 !== 'string' || customerRequest.currentAddress2 == null ||
-        typeof customerRequest.dob !== 'string' || customerRequest.dob== null ||
-        typeof customerRequest.gender !== 'string' || customerRequest.gender == null
+  if (customerRequest.firstName == null || customerRequest.lastName == null ||
+        customerRequest.currentAddress1 == null || customerRequest.currentAddress2 == null ||
+        customerRequest.dob== null || customerRequest.gender == null
   ) {
     console.error('Customer Update Validation Failed');
     const errorResponse = {
       statusCode: 400,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify( { error : `Could not update the Customer: ${customerId}. Incomplete information was provided.` } )   };
     return errorResponse;
   }
@@ -57,12 +54,16 @@ exports.update = async (event, context) => {
 
     const updatedCustomerResponse = await dynamoDb.updateItem(newCustomer).promise();
     const updatedCustomer = convertCustomerItemToHttpAPI(updatedCustomerResponse.Attributes);
-    return { statusCode: 200, body: JSON.stringify(updatedCustomer) };
+    return { 
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify(updatedCustomer)
+    };
     
   } catch (error) {
     return {
       statusCode: 400,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify( { error : `Could not update the Customer: ${customerId}. Error [${error.stack}].` } )
     };
   }

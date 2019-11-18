@@ -9,17 +9,14 @@ const dynamoDb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 exports.create = async (event, context) => {
 
   const mortgageRequest = JSON.parse(event.body);
-  if (typeof mortgageRequest.loanAmount !== 'string' || mortgageRequest.loanAmount == null ||
-        typeof mortgageRequest.yearsInEmployment !== 'string' || mortgageRequest.yearsInEmployment == null ||
-        typeof mortgageRequest.salary !== 'string' || mortgageRequest.salary == null ||
-        typeof mortgageRequest.employerName !== 'string' || mortgageRequest.employerName == null ||
-        typeof mortgageRequest.term !== 'string' || mortgageRequest.term == null ||
-        typeof mortgageRequest.customerId !== 'string' || mortgageRequest.customerId == null
+  if (mortgageRequest.loanAmount == null || mortgageRequest.yearsInEmployment == null ||
+    mortgageRequest.salary == null || mortgageRequest.employerName == null ||
+    mortgageRequest.term == null || mortgageRequest.customerId == null
   ) {
     console.error('Validation Failed');
     const errorResponse = {
       statusCode: 400,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify( { error : `Incomplete/Invalid Parameters. Couldn\'t create the mortgage application.` } )    
     };
     return errorResponse;
@@ -79,12 +76,16 @@ exports.create = async (event, context) => {
 
     const newMortgageResponse = await dynamoDb.putItem(newMortgage).promise();
     
-    return { statusCode: 200, body: JSON.stringify(newMortgageId) };
+    return { 
+      statusCode: 200, 
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify(newMortgageId) 
+    };
     
   } catch (error) {
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify( { error : `Could not obtain new Mortgage ID: ${error.stack}` } )
     };
   }

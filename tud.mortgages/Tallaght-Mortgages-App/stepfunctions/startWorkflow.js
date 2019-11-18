@@ -20,13 +20,13 @@ exports.handler = async (event, context) => {
         const workflowExecution = await stepfunctions.startExecution(params).promise();
         return {
             statusCode: 200,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
             body: JSON.stringify(workflowExecution)
         };
     } catch (error) {
         return {
             statusCode: 500,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
             body: JSON.stringify( { error : `Could not start the Workflow execution: ${error.stack}` } )
         };
     }

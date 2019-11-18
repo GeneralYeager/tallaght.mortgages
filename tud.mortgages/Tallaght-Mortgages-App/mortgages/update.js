@@ -12,17 +12,14 @@ exports.update = async (event, context) => {
   const mortgageId = event.pathParameters.id;
 
   const mortgageRequest = JSON.parse(event.body);
-  if (typeof mortgageRequest.loanAmount !== 'string' || mortgageRequest.loanAmount == null ||
-        typeof mortgageRequest.yearsInEmployment !== 'string' || mortgageRequest.yearsInEmployment == null ||
-        typeof mortgageRequest.salary !== 'string' || mortgageRequest.salary == null ||
-        typeof mortgageRequest.employerName !== 'string' || mortgageRequest.employerName == null ||
-        typeof mortgageRequest.term !== 'string' || mortgageRequest.term == null ||
-        typeof mortgageRequest.mortgageStatus !== 'string' || mortgageRequest.mortgageStatus == null
+  if (mortgageRequest.loanAmount == null || mortgageRequest.yearsInEmployment == null ||
+      mortgageRequest.salary == null || mortgageRequest.employerName == null ||
+      mortgageRequest.term == null || mortgageRequest.mortgageStatus == null
   ) {
     console.error('Validation Failed');
     const errorResponse = {
       statusCode: 400,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify( { error : `Validation. Parameter types. Couldn\'t update the mortgage application.` } )
     };
     return errorResponse;
@@ -34,19 +31,20 @@ exports.update = async (event, context) => {
       if (foundMortgage == null) {
           return {
               statusCode: 400,
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
               body: JSON.stringify( { error : `Could not update the Mortgage: ${mortgageId}.` } )
           };
       }
 
       return { 
           statusCode: 200, 
+          headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
           body: JSON.stringify(foundMortgage) 
       };
   } catch (error) {
       return {
           statusCode: 500,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
           body: JSON.stringify( { error : `Could not update the Mortgage: ${mortgageId}. Error [${error.stack}].` } )
       };
   }

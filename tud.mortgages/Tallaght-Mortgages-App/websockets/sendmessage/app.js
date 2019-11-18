@@ -18,7 +18,7 @@ exports.handler = async (event, context) => {
   
   const apigwManagementApi = new AWS.ApiGatewayManagementApi({
     apiVersion: '2018-11-29',
-    endpoint: WEBSOCKET_ENDPOINT //'pfmuelpqxb.execute-api.eu-west-1.amazonaws.com/Prod'//event.requestContext.domainName + '/' + event.requestContext.stage
+    endpoint: WEBSOCKET_ENDPOINT //event.requestContext.domainName + '/' + event.requestContext.stage
   });
   
   //const postData = JSON.parse(event.body).data;
