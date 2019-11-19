@@ -49,24 +49,7 @@ Resources:
           Protocol: email
       TopicName: BrokerSNSTopic
 
-  # STEP FUNCTION HUMAN TOKEN DYNAMO DB TABLE
-  StepFunctionTokenTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-      - AttributeName: "mortgageId"
-        AttributeType: "S"
- #     - AttributeName: "stepFunctionToken"
- #       AttributeType: "S"
-      KeySchema:
-      - AttributeName: "connectionId"
-        KeyType: "HASH"
- #     - AttributeName: "stepFunctionToken"
- #       KeyType: "RANGE"
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
-      TableName: !Ref StepFunctionTokenTableName
+ 
 
   # CUSTOMER APIS
   GetCustomerFunction:
@@ -184,6 +167,26 @@ Resources:
             Path: /mortgage/
             Method: GET
 
+  # STEP FUNCTION HUMAN TOKEN DYNAMO DB TABLE
+  StepFunctionTokenTable:
+    Type: AWS::DynamoDB::Table  
+    Properties:
+      TableName: !Ref StepFunctionTokenTableName
+      AttributeDefinitions:
+        - AttributeName: "mortgageId"
+          AttributeType: "S"
+ #     - AttributeName: "stepFunctionToken"
+ #       AttributeType: "S"
+      KeySchema:
+        - AttributeName: "mortgageId"
+          KeyType: "HASH"
+ #     - AttributeName: "stepFunctionToken"
+ #       KeyType: "RANGE"
+#      ProvisionedThroughput:
+#        ReadCapacityUnits: 5
+#        WriteCapacityUnits: 5
+      BillingMode: PAY_PER_REQUEST
+
   # WORKFLOW APIS
   MortgageSNSFunction:
     Type: AWS::Serverless::Function
@@ -249,8 +252,8 @@ Resources:
         StartWorkflowEvent:
           Type: Api
           Properties:
-            Path: /workflow/
-            Method: POST
+            Path: /workflow/execution
+            Method: PUT
   AutoAssessmentFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -272,6 +275,26 @@ Resources:
       Runtime: nodejs10.x
       Role: 
         Ref: LambdaRoleParameter
+  UnderwriterApprovalEmailFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: workflow/sendUnderwriterApprovalEmail.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+  UnderwriterApprovalEmailFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: workflow/receiveUnderwriterDecision.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+      Events:
+        UnderwriterDecisionEvent:
+          Type: Api
+          Properties:
+            Path: /workflow/execution
+            Method: POST
 
   # WEBSOCKET APIS
   MortgageWebSocket:
@@ -361,16 +384,17 @@ Resources:
   WebsocketConnectionsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      AttributeDefinitions:
-      - AttributeName: "connectionId"
-        AttributeType: "S"
-      KeySchema:
-      - AttributeName: "connectionId"
-        KeyType: "HASH"
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
       TableName: !Ref WebsocketConnectionTableName
+      AttributeDefinitions:
+        - AttributeName: "connectionId"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "connectionId"
+          KeyType: "HASH"
+   #   ProvisionedThroughput:
+   #     ReadCapacityUnits: 5
+    #    WriteCapacityUnits: 5
+      BillingMode: PAY_PER_REQUEST
 
   # WEBSOCKET LAMBDA API
   WebSocketConnectFunction:
@@ -478,9 +502,9 @@ Outputs:
  #   Value: !GetAtt ListByStatusMortgageFunction.Arn
 
   # WEBSOCKET OUTPUTS
-  ConnectionsTableArn:
-    Description: "Websocket Connections table ARN"
-    Value: !GetAtt WebsocketConnectionsTable.Arn
+ # ConnectionsTableArn:
+ #   Description: "Websocket Connections table ARN"
+ #   Value: !GetAtt WebsocketConnectionsTable.Arn
 
   WebSocketConnectFunctionArn:
     Description: "Websocket OnConnect function ARN"

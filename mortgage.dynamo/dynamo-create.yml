@@ -18,6 +18,7 @@ Resources:
           - AttributeName: idName
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+        
     CustomerTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -29,6 +30,7 @@ Resources:
           - AttributeName: customerId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+        
     MortgagesTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -61,7 +63,7 @@ Resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-        
+         
 Outputs:
     IDGenTableARN:
       Value:
