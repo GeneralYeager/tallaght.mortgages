@@ -1,6 +1,7 @@
 'use strict';
 
 const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
+//////NOT USED
 
 // Create promise and SNS service object
 const snsModule = new AWS.SNS({apiVersion: '2010-03-31'});
