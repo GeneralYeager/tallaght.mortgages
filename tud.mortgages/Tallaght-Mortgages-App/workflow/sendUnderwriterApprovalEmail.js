@@ -2,10 +2,11 @@ const AWS = require('aws-sdk');
 
 const snsModule = new AWS.SNS({apiVersion: '2010-03-31'});
 
-exports.lambda_handler = async (event, context, callback) => {
+const { UNDERWRITER_DECISION_API, UNDERWRITER_TOPIC_ARN } = process.env;
 
-    try {
-       
+exports.handler = async (event, context, callback) => {
+
+    try {       
         console.log('event= ' + JSON.stringify(event));
         console.log('context= ' + JSON.stringify(context));
     
@@ -21,16 +22,23 @@ exports.lambda_handler = async (event, context, callback) => {
         const taskToken = executionContext.Task.Token;
         console.log('taskToken= ' + taskToken);
     
-        const apigwEndpint = event.APIGatewayEndpoint;
-        console.log('apigwEndpint = ' + apigwEndpint)
+        const apigwEndpint = UNDERWRITER_DECISION_API;//event.APIGatewayEndpoint;
+        console.log('apigwEndpint = ' + apigwEndpint);
     
-        const approveEndpoint = apigwEndpint + "/execution?action=approve&ex=" + executionName + "&sm=" + statemachineName + "&taskToken=" + encodeURIComponent(taskToken);
+/*        const approveEndpoint = apigwEndpint + "/execution?action=approve&ex=" + executionName + "&sm=" + statemachineName + "&taskToken=" + encodeURIComponent(taskToken);
         console.log('approveEndpoint= ' + approveEndpoint);
     
         const rejectEndpoint = apigwEndpint + "/execution?action=reject&ex=" + executionName + "&sm=" + statemachineName + "&taskToken=" + encodeURIComponent(taskToken);
         console.log('rejectEndpoint= ' + rejectEndpoint);
-    
-        const emailSnsTopic = "${SNSHumanApprovalEmailTopic}";
+*/
+        const approveEndpoint = apigwEndpint + "?action=approve&ex=" + executionName + "&sm=" + statemachineName + "&taskToken=" + encodeURIComponent(taskToken);
+        console.log('approveEndpoint= ' + approveEndpoint);
+
+        const rejectEndpoint = apigwEndpint + "?action=reject&ex=" + executionName + "&sm=" + statemachineName + "&taskToken=" + encodeURIComponent(taskToken);
+        console.log('rejectEndpoint= ' + rejectEndpoint);
+
+
+        const emailSnsTopic = UNDERWRITER_TOPIC_ARN;//"${SNSHumanApprovalEmailTopic}";
         console.log('emailSnsTopic= ' + emailSnsTopic);
     
         let emailMessage = 'This is an email requesting that the Underwriter perform a review of the Mortgage Application. \n\n';

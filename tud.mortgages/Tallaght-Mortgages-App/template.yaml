@@ -272,7 +272,8 @@ Resources:
         Variables:
           UNDERWRITER_DECISION_API: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/workflow/execution"
 #          UNDERWRITER_DECISION_API: !Join [ 'https://', [ !Ref ServerlessRestApi, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/Prod/workflow/execution'] ]
-
+          UNDERWRITER_TOPIC_ARN: !Ref UnderwriterSNSTopic
+          
   ReceiveUnderwriterDecisionEmailFunction:
     Type: AWS::Serverless::Function
     Properties:

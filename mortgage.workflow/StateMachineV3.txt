@@ -20,7 +20,7 @@
 
 		"MortgageApplicationNotFound": {
 			"Type": "Task",
-			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-NofifyUsersSNSFunction-216EXFJBHO0V",
+			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-NofifyUsersSNSFunction-ETVMRKWXEL1",
 			"Parameters": {
 				"TopicArn": "arn:aws:sns:eu-west-1:727432808710:BrokerSNSTopic",
 				"Message.$": "$.error"
@@ -59,7 +59,7 @@
 
         "NotifyUnderwriterAssessment": {
 			"Type": "Task",
-			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-MortgageStatusSNSFunction-5UVPVE4OU9PF",
+			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-MortgageStatusSNSFunction-33OC4S31UOX1",
 			"Parameters": {
 				"TopicArn": "arn:aws:sns:eu-west-1:727432808710:UnderwriterSNSTopic",
 				"mortgage.$": "$"
@@ -80,7 +80,7 @@
       
       	"NotifyBrokerApproved": {
 			"Type": "Task",
-			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-MortgageStatusSNSFunction-5UVPVE4OU9PF",
+			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-MortgageStatusSNSFunction-33OC4S31UOX1",
 			"Parameters": {
 				"TopicArn": "arn:aws:sns:eu-west-1:727432808710:BrokerSNSTopic",
 				"mortgage.$": "$"
