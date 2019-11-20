@@ -1,0 +1,115 @@
+{
+	"StartAt": "GetMortgageApplication",
+	"States": {
+	
+		"GetMortgageApplication": {
+			"Type": "Task",
+			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-WorkflowGetMorgtageFunction-16L3UM67HNU4N",
+			"Next": "GetMortgageApplicationResult"
+		},
+	
+		"GetMortgageApplicationResult": {
+			"Type": "Choice",
+			"Choices": [{
+				"Variable": "$.statusCode",
+				"NumericEquals": 200,
+				"Next": "AutoAssessment"
+			}],
+			"Default": "MortgageApplicationNotFoundMessage"
+		},
+
+		"MortgageApplicationNotFoundMessage": {
+			"Type": "Task",
+			"Resource": "XXXXXXX",
+			"Parameters": {
+				"messageType": "mortgageNotFoundMessage",
+				"mortgage.$": "$.mortgage"
+			},
+			"ResultPath": "$.notify",
+			"Next": "MortgageApplicationNotFoundNotify"
+		},
+		
+		"MortgageApplicationNotFoundNotify": {
+			"Type": "Task",
+			"InputPath": "$.notify",
+			"Resource": "XXXXXXXXXXXX",
+			"End": true
+		},
+
+		"AutoAssessmentMessage": {
+			"Type": "Task",
+			"InputPath": "$.mortgage",
+            "Resource": "XXXXXXXXXXX",
+            "ResultPath": "$",
+            "Next": "AutoAssessmentNotify"
+		},
+	
+		"AutoAssessmentNotify": {
+			"Type": "Task",
+			"InputPath": "$.mortgage",
+            "Resource": "XXXXXXXXXXXX",
+            "ResultPath": "$",
+            "Next": "AutoAssessment"
+		},
+		
+		"AutoAssessment": {
+			"Type": "Task",
+			"InputPath": "$.mortgage",
+            "Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-AutoAssessmentFunction-S230S392YHS1",
+            "ResultPath": "$",
+            "Next": "AutoAssessmentResult"
+		},
+      
+        "AutoAssessmentResult": {
+			"Type": "Choice",
+			"Choices": [{
+				"Variable": "$.statusCode",
+				"NumericEquals": 200,
+				"Next": "ApproveMortgage"
+			}],
+			"Default": "AutoAssessmentRejection"
+		},
+
+      	"AutoAssessmentRejection": {
+			"Type": "Task",
+          	"Parameters": {
+				"mortgage.$": "$.mortgage",
+				"newStatus": "WithUnderwriter"
+			},
+			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-ChangeMortgageStatusFunction-2NK931AA2H2N",
+            "OutputPath": "$.mortgage",
+            "Next": "NotifyUnderwriterAssessment"
+		},
+
+        "NotifyUnderwriterAssessment": {
+			"Type": "Task",
+			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-MortgageStatusSNSFunction-5UVPVE4OU9PF",
+			"Parameters": {
+				"TopicArn": "arn:aws:sns:eu-west-1:727432808710:UnderwriterSNSTopic",
+				"mortgage.$": "$"
+			},
+			"End": true
+		},
+      
+		"ApproveMortgage": {
+			"Type": "Task",
+          	"Parameters": {
+				"mortgage.$": "$.mortgage",
+				"newStatus": "Approved"
+			},
+			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-ChangeMortgageStatusFunction-2NK931AA2H2N",
+            "OutputPath": "$.mortgage",
+            "Next": "NotifyBrokerApproved"
+		},
+      
+      	"NotifyBrokerApproved": {
+			"Type": "Task",
+			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-MortgageStatusSNSFunction-5UVPVE4OU9PF",
+			"Parameters": {
+				"TopicArn": "arn:aws:sns:eu-west-1:727432808710:BrokerSNSTopic",
+				"mortgage.$": "$"
+			},
+			"End": true
+		}
+	}
+}

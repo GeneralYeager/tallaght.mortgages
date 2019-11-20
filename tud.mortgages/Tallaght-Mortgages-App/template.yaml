@@ -261,14 +261,19 @@ Resources:
       Runtime: nodejs10.x
       Role: 
         Ref: LambdaRoleParameter
-  UnderwriterApprovalEmailFunction:
+  SendUnderwriterDecisionEmailFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: workflow/sendUnderwriterApprovalEmail.handler
       Runtime: nodejs10.x
       Role: 
         Ref: LambdaRoleParameter
-  UnderwriterApprovalEmailFunction:
+      Environment:
+        Variables:
+          UNDERWRITER_DECISION_API: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/workflow/execution"
+#          UNDERWRITER_DECISION_API: !Join [ 'https://', [ !Ref ServerlessRestApi, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/Prod/workflow/execution'] ]
+
+  ReceiveUnderwriterDecisionEmailFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: workflow/receiveUnderwriterDecision.handler
@@ -280,7 +285,7 @@ Resources:
           Type: Api
           Properties:
             Path: /workflow/execution
-            Method: POST
+            Method: GET
 
   # WEBSOCKET APIS
   MortgageWebSocket:

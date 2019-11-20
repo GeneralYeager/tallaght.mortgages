@@ -29,15 +29,15 @@ const stepfunctions = new AWS.StepFunctions();
 
 exports.handler = async (event, context, callback) => {
 
+    console.log('Event= ' + JSON.stringify(event));
+    const action = event.query.action;
+    const taskToken = event.query.taskToken;
+    const statemachineName = event.query.sm;
+    const executionName = event.query.ex;
+
     try {
-        console.log('Event= ' + JSON.stringify(event));
-        const action = event.query.action;
-        const taskToken = event.query.taskToken;
-        const statemachineName = event.query.sm;
-        const executionName = event.query.ex;
-
+        
         var message = "";
-
         if (action === "approve") {
             message = { "Status": "Approved! Task approved by ${Email}" };
         } else if (action === "reject") {
@@ -52,7 +52,7 @@ exports.handler = async (event, context, callback) => {
             taskToken: event.query.taskToken
             }).promise();
 
-        console.log(JSON.stringify(data));
+        console.log(JSON.stringify(result));
         return {
             statusCode: 200,
             headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },

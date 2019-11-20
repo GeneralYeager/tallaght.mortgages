@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 
 const snsModule = new AWS.SNS({apiVersion: '2010-03-31'});
 
-exports.lambda_handler = (event, context, callback) => {
+exports.lambda_handler = async (event, context, callback) => {
 
     try {
        
@@ -33,11 +33,11 @@ exports.lambda_handler = (event, context, callback) => {
         const emailSnsTopic = "${SNSHumanApprovalEmailTopic}";
         console.log('emailSnsTopic= ' + emailSnsTopic);
     
-        emailMessage += 'This is an email requesting that the Underwriter perform a review of the Mortgage Application. \n\n'
-        emailMessage += 'Please check the following information and click "Approve" link if you want to approve. \n\n'
-        emailMessage += 'Execution Name -> ' + executionName + '\n\n'
-        emailMessage += 'Approve ' + approveEndpoint + '\n\n'
-        emailMessage += 'Reject ' + rejectEndpoint + '\n\n'
+        let emailMessage = 'This is an email requesting that the Underwriter perform a review of the Mortgage Application. \n\n';
+        emailMessage += 'Please check the following information and click "Approve" link if you want to approve. \n\n';
+        emailMessage += 'Execution Name -> ' + executionName + '\n\n';
+        emailMessage += 'Approve ' + approveEndpoint + '\n\n';
+        emailMessage += 'Reject ' + rejectEndpoint + '\n\n';
     
         var params = {
             Message: emailMessage,
