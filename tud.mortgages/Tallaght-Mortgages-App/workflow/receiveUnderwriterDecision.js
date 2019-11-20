@@ -39,9 +39,9 @@ exports.handler = async (event, context, callback) => {
         
         var message = "";
         if (action === "approve") {
-            message = { "Status": "Approved! Task approved by Underwriter" };
+            message = { "Status": "Approved! Mortgage approved by Underwriter" };
         } else if (action === "reject") {
-            message = { "Status": "Rejected! Task rejected by Underwriter" };
+            message = { "Status": "Rejected! Mortgage rejected by Underwriter" };
         } else {
             console.error("Unrecognized action. Expected: approve, reject.");
             callback({"Status": "Failed to process the request. Unrecognized Action."});
