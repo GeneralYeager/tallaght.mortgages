@@ -8,9 +8,10 @@ const ddb = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
 
 const { TABLE_NAME, WEBSOCKET_ENDPOINT } = process.env;
 
-exports.handler = async (event, context) => {
+exports.handler = async function (event, context) {
 
-    let params = event;
+    let audience = event.Audience;
+    let params = event.snsParam;
   /*  let params = event;
     try {
         // Create promise and SNS service object
@@ -43,7 +44,7 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        connectionData = await ddb.scan({ TableName: TABLE_NAME, ProjectionExpression: 'connectionId' }).promise();
+        let connectionData = await ddb.scan({ TableName: TABLE_NAME, ProjectionExpression: 'connectionId' }).promise();
      
         const apigwManagementApi = new AWS.ApiGatewayManagementApi({
             apiVersion: '2018-11-29',
@@ -52,10 +53,14 @@ exports.handler = async (event, context) => {
       
         //const postData = JSON.parse(event.body).data;
         //const postData = '{\"author\": \"1212121", \"message\": \"Mortgage 1212121 is now Auto Approved"}';
-      
+        const websocketMessage = {
+            audience: audience,
+            message: params.Message
+        };
+
         const postCalls = connectionData.Items.map(async ({ connectionId }) => {
             try {
-                await apigwManagementApi.postToConnection({ ConnectionId: connectionId, Data: /*postData*/params }).promise();
+                await apigwManagementApi.postToConnection({ ConnectionId: connectionId, Data: JSON.stringify(websocketMessage) }).promise();
             } catch (e) {
               if (e.statusCode === 410) {
                     console.log(`Found stale connection, deleting ${connectionId}`);

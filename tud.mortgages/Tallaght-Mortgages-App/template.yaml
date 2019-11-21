@@ -203,6 +203,38 @@ Resources:
       - UnderwriterSNSTopic
       - BrokerSNSTopic
 
+  CreateNotificationMessageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: stepfunctions/notifications/notificationMessages.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+      Environment:
+        Variables:
+          UNDERWRITER_TOPIC_ARN: !Ref UnderwriterSNSTopic
+          BROKER_TOPIC_ARN: !Ref BrokerSNSTopic
+    DependsOn:
+      - UnderwriterSNSTopic
+      - BrokerSNSTopic
+
+  SendNotificationMessageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: stepfunctions/notifications/sendNotifications.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref WebsocketConnectionTableName
+          WEBSOCKET_ENDPOINT: !Join [ '', [ !Ref MortgageWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/Prod'] ]
+    DependsOn:
+      - UnderwriterSNSTopic
+      - BrokerSNSTopic
+      - WebsocketConnectionsTable
+      - MortgageWebSocket
+
   WorkflowGetCustomerFunction:
     Type: AWS::Serverless::Function
     Properties:

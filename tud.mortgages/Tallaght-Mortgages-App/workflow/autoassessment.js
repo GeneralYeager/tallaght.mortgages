@@ -15,8 +15,8 @@ exports.handler = async (event, context) => {
                 return { 
                     statusCode: 400,
                     approved: false,
-                    reason: 'Must be employed for more that 10 years for autoapproval',
-                    mortgage: mortgageApplication
+                    reason: 'Must be employed for more that 10 years for autoapproval'/*,
+                    mortgage: mortgageApplication*/
                 };
             }
         }
@@ -26,8 +26,8 @@ exports.handler = async (event, context) => {
                 return { 
                     statusCode: 400,
                     approved: false, 
-                    reason: 'Must be earning in excess of 100000 euro for autoapproval',
-                    mortgage: mortgageApplication
+                    reason: 'Must be earning in excess of 100000 euro for autoapproval'/*,
+                    mortgage: mortgageApplication*/
                 };
             }
         }
@@ -35,8 +35,8 @@ exports.handler = async (event, context) => {
         return { 
             statusCode: 200,
             approved: true, 
-            reason: 'All criteria for autoapproval have been met.',
-            mortgage: mortgageApplication
+            reason: 'All criteria for autoapproval have been met.'/*,
+            mortgage: mortgageApplication*/
         };
     } catch (error) {
         return {

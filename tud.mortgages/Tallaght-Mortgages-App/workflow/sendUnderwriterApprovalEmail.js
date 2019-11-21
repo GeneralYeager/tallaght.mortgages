@@ -7,9 +7,10 @@ const { UNDERWRITER_DECISION_API, UNDERWRITER_TOPIC_ARN } = process.env;
 exports.handler = async (event, context, callback) => {
 
     try {       
-        console.log('event= ' + JSON.stringify(event));
-        console.log('context= ' + JSON.stringify(context));
-    
+        //console.log('event= ' + JSON.stringify(event));
+        const mortgage = event.mortgage;
+        console.log('mortgage= ' + JSON.stringify(mortgage));
+
         const executionContext = event.ExecutionContext;
         console.log('executionContext= ' + executionContext);
     
@@ -31,17 +32,18 @@ exports.handler = async (event, context, callback) => {
         const rejectEndpoint = apigwEndpint + "/execution?action=reject&ex=" + executionName + "&sm=" + statemachineName + "&taskToken=" + encodeURIComponent(taskToken);
         console.log('rejectEndpoint= ' + rejectEndpoint);
 */
-        const approveEndpoint = apigwEndpint + "?action=approve&ex=" + executionName + "&sm=" + statemachineName + "&taskToken=" + encodeURIComponent(taskToken);
+        //const approveEndpoint = apigwEndpint + "?action=approve&ex=" + executionName + "&sm=" + statemachineName + "&taskToken=" + encodeURIComponent(taskToken);
+        const approveEndpoint = apigwEndpint + "?action=approve&mortgageId=" + mortgage.mortgageId + "&taskToken=" + encodeURIComponent(taskToken);
         console.log('approveEndpoint= ' + approveEndpoint);
 
-        const rejectEndpoint = apigwEndpint + "?action=reject&ex=" + executionName + "&sm=" + statemachineName + "&taskToken=" + encodeURIComponent(taskToken);
+        const rejectEndpoint = apigwEndpint + "?action=reject&mortgageId=" + mortgage.mortgageId + "&taskToken=" + encodeURIComponent(taskToken);
         console.log('rejectEndpoint= ' + rejectEndpoint);
 
 
         const emailSnsTopic = UNDERWRITER_TOPIC_ARN;//"${SNSHumanApprovalEmailTopic}";
         console.log('emailSnsTopic= ' + emailSnsTopic);
     
-        let emailMessage = 'This is an email requesting that the Underwriter perform a review of the Mortgage Application. \n\n';
+        let emailMessage = `This is an email requesting that the Underwriter perform a review of the Mortgage Application [${mortgage.mortgageId}]. \n\n`;
         emailMessage += 'Please check the following information and click "Approve" link if you want to approve. \n\n';
         emailMessage += 'Execution Name -> ' + executionName + '\n\n';
         emailMessage += 'Approve ' + approveEndpoint + '\n\n';
@@ -49,7 +51,7 @@ exports.handler = async (event, context, callback) => {
     
         var params = {
             Message: emailMessage,
-            Subject: "Underwriting Decision required for Mortgage [].",
+            Subject: `Underwriting Decision required for Mortgage [${mortgage.mortgageId}].`,
             TopicArn: emailSnsTopic
         };
         

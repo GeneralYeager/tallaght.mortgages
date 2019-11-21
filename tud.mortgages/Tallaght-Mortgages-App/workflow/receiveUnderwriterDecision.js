@@ -29,34 +29,43 @@ const stepfunctions = new AWS.StepFunctions();
 
 exports.handler = async (event, context, callback) => {
 
-    console.log('Event= ' + JSON.stringify(event));
-    const action = event.query.action;
-    const taskToken = event.query.taskToken;
-    const statemachineName = event.query.sm;
-    const executionName = event.query.ex;
+    //console.log('Event= ' + JSON.stringify(event));
+    
+    console.log('Event= ' + JSON.stringify(event.queryStringParameters));
+    const action = event.queryStringParameters.action;
+    const taskToken = event.queryStringParameters.taskToken;
+    //const statemachineName = event.queryStringParameters.sm;
+    //const executionName = event.queryStringParameters.ex;
+    const mortgageId = event.queryStringParameters.mortgageId;
 
     try {
         
-        var message = "";
+        let decision;
         if (action === "approve") {
-            message = { "Status": "Approved! Mortgage approved by Underwriter" };
+            decision = { 
+                statusCode: 200,
+                Status: `Mortgage [${mortgageId}] Approved!` 
+            };
         } else if (action === "reject") {
-            message = { "Status": "Rejected! Mortgage rejected by Underwriter" };
+            decision = { 
+                statusCode: 500,
+                Status: `Mortgage [${mortgageId}] Rejected!` 
+            };
         } else {
             console.error("Unrecognized action. Expected: approve, reject.");
             callback({"Status": "Failed to process the request. Unrecognized Action."});
         }
 
         const result = await stepfunctions.sendTaskSuccess({
-                output: JSON.stringify(message),
-                taskToken: taskToken
-            }).promise();
+            output: JSON.stringify(decision),
+            taskToken: taskToken
+        }).promise();
 
         console.log(JSON.stringify(result));
         return {
             statusCode: 200,
             headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
-            body: JSON.stringify(message)
+            body: JSON.stringify(decision.Status)
         };
     } catch (error) {
         console.log(error);
