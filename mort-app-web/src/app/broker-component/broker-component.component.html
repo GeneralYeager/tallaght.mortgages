@@ -2,6 +2,7 @@
 
 <button mat-button (click)="goToHomePage($event)">Home</button>
 <button mat-button (click)="goToNewMortgage($event)">Create New Mortgage</button>
+<button mat-button (click)="refreshTable($event)">Reload Mortgages</button>
 
 <table mat-table [dataSource]="mortgageList" multiTemplateDataRows class="table.center mat-elevation-z8">
   <ng-container matColumnDef="{{column}}" *ngFor="let column of columnsToDisplay">
@@ -39,6 +40,9 @@
               </mat-form-field></td>
             </tr></table>
             <a href="" class="button" mat-button (click)="updateMortgage($event, element)">Save</a>
+
+            <a *ngIf="element.mortgageStatus=='PreSubmission'" href="" class="button" mat-button (click)="submitForApproval($event, element)">Submit For Approval</a>
+
           </form>
 
       </div>

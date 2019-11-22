@@ -223,12 +223,31 @@ Resources:
     Properties:
       Handler: stepfunctions/notifications/sendNotifications.handler
       Runtime: nodejs10.x
-      Role: 
-        Ref: LambdaRoleParameter
+    #  Role: 
+       # Ref: LambdaRoleParameter
       Environment:
         Variables:
           TABLE_NAME: !Ref WebsocketConnectionTableName
           WEBSOCKET_ENDPOINT: !Join [ '', [ !Ref MortgageWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/Prod'] ]
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref WebsocketConnectionTableName
+   #   - SNSPublishMessagePolicy:
+    #      TopicName: !Ref UnderwriterSNSTopic
+     # - SNSPublishMessagePolicy:
+      #    TopicName: !Ref BrokerSNSTopic
+      - Statement:
+        - Effect: Allow
+          Action:
+          - 'sns:*'
+          Resource:
+          - '*'
+      - Statement:
+        - Effect: Allow
+          Action:
+          - 'execute-api:ManageConnections'
+          Resource:
+          - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${MortgageWebSocket}/*'
     DependsOn:
       - UnderwriterSNSTopic
       - BrokerSNSTopic
@@ -494,7 +513,6 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref WebSocketSendFunction
       Principal: apigateway.amazonaws.com
-
 
 Outputs:
   MortgageApi:

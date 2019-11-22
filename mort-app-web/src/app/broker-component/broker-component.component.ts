@@ -34,9 +34,28 @@ export class BrokerComponentComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.loadMortgages();
+  }
+
+  refreshTable(event) {
+    event.preventDefault();
+    this.loadMortgages();
+  }
+
+  loadMortgages() {
     this.mortgageApi.getMortgages().subscribe((data: Mortgage[]) => {
       this.mortgageList = data;
-    })
+    });
+  }
+
+  submitForApproval(event, mortgage) {
+    event.preventDefault();
+    this.mortgageApi.submitMortgage(mortgage.mortgageId).subscribe((data) => {
+      console.log(JSON.stringify(data));
+      console.log(data);
+      alert(`Mortgage ${mortgage.mortgageId} successfully submitted.\n` + JSON.stringify(data));
+      this.loadMortgages();
+    });
   }
 
   goToHomePage(event) {

@@ -83,6 +83,19 @@ export class MortgageApiService {
     )
   }
 
+   // HttpClient API delete() method
+   submitMortgage(id) {
+    const workflowInput = {
+      mortgageId: id
+    };
+
+    return this.http.put<String>(this.apiURL + '/workflow/execution/', JSON.stringify(workflowInput), this.httpOptions)
+    .pipe(
+      retry(this.numRetries),
+      catchError(this.handleError)
+    )
+  }
+
   // Error handling
   handleError(error) {
     let errorMessage = '';

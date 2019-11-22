@@ -37,6 +37,7 @@ exports.handler = async function (event, context) {
         console.log("MessageID is " + data.MessageId);
 
     } catch (error) {
+        console.log("SNS Publish="+ JSON.stringify(error));
         return {
             statusCode: 500,
             error: `Could not sent SNS notification [${params.Message}]. Error[${error.stack}]`
@@ -62,6 +63,7 @@ exports.handler = async function (event, context) {
             try {
                 await apigwManagementApi.postToConnection({ ConnectionId: connectionId, Data: JSON.stringify(websocketMessage) }).promise();
             } catch (e) {
+              console.log("postToConnection="+ JSON.stringify(e));
               if (e.statusCode === 410) {
                     console.log(`Found stale connection, deleting ${connectionId}`);
                     await ddb.delete({ TableName: TABLE_NAME, Key: { connectionId } }).promise();
