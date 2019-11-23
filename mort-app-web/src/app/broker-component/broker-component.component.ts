@@ -4,12 +4,10 @@ import { Mortgage } from '../model/mortgage.model'
 import { MortgageApiService } from '../services/mortgage-api.service'
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
-/*
-const ELEMENT_DATA: MortgageApplication[] = [
-  {mortgageId: '1', loanAmount: 250000, employerName: 'Hydrogen', term: 11, salary: 10100},
-  {mortgageId: '2', loanAmount: 250000, employerName: 'Hydrogen', term: 11, salary: 10100}
-];
-*/
+import { UnderwriterNotificationsService } from "../underwriter-notifications.service";
+import { AlertService } from '../_alert';
+import { Subscription } from 'rxjs'
+
 @Component({
   selector: 'app-broker-component',
   templateUrl: './broker-component.component.html',
@@ -26,14 +24,25 @@ export class BrokerComponentComponent implements OnInit {
 
   title = 'Tallaght Mortgages Brokers Page';
 
+  private subscription: Subscription;
+
   columnsToDisplay: string[] = ['mortgageId', 'customerId', 'employerName', 'loanAmount', 'mortgageStatus', 'salary', 'term', 'yearsInEmployment'];
   mortgageList: Mortgage[];// = ELEMENT_DATA;
   expandedElement: Mortgage | null;
 
-  constructor(private router: Router, private mortgageApi: MortgageApiService) {     
+  constructor(private router: Router, 
+              private mortgageApi: MortgageApiService,
+              private messagesService: UnderwriterNotificationsService, 
+              private alertService: AlertService) {     
   }
 
   ngOnInit() {
+    this.subscription = this.messagesService.messages.subscribe(msg => {
+      console.log("Broker from websocket: " + msg.message);
+      if (msg.audience == 'Broker') this.alertService.success(msg.message);
+      
+      this.loadMortgages();
+    });
     this.loadMortgages();
   }
 

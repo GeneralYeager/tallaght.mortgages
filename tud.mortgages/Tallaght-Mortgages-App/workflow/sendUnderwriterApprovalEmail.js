@@ -2,7 +2,9 @@ const AWS = require('aws-sdk');
 
 const snsModule = new AWS.SNS({apiVersion: '2010-03-31'});
 
-const { UNDERWRITER_DECISION_API, UNDERWRITER_TOPIC_ARN } = process.env;
+const notificationUtil = require('../stepfunctions/notifications/utils/notificationUtils');
+
+const { UNDERWRITER_DECISION_API, UNDERWRITER_TOPIC_ARN, TABLE_NAME, WEBSOCKET_ENDPOINT } = process.env;
 
 exports.handler = async (event, context, callback) => {
 
@@ -56,13 +58,16 @@ exports.handler = async (event, context, callback) => {
         };
         
         // Create promise and SNS service object
-        var data = await snsModule.publish(params).promise();
+       /* var data = await snsModule.publish(params).promise();
         console.log(`Message ${params.Message} send sent to the topic ${params.TopicArn}`);
         console.log("MessageID is " + data.MessageId);
-     
+     */
+        await notificationUtil.publishSNS(params);
+        await notificationUtil.publishWebSocket('Underwriter', params.Subject, TABLE_NAME, WEBSOCKET_ENDPOINT);
+        
         return { 
             statusCode: 200,
-            messageId: data.MessageId
+        //    messageId: data.MessageId
         };
     } catch (error) {
         return {

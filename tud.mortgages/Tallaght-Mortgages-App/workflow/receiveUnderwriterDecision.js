@@ -72,7 +72,7 @@ exports.handler = async (event, context, callback) => {
         return {
             statusCode: 400,
             headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
-            error: `Could not restart the Step Function excution [${executionName}]`
+            error: `Could not restart the Step Function excution [${error}]`
         };
     }
 }

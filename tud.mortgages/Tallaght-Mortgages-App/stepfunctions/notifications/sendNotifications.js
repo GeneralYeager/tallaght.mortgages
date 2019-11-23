@@ -6,31 +6,23 @@ const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-depe
 const snsModule = new AWS.SNS({apiVersion: '2010-03-31'});
 const ddb = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
 
+const notificationUtil = require('./utils/notificationUtils');
+
 const { TABLE_NAME, WEBSOCKET_ENDPOINT } = process.env;
 
 exports.handler = async function (event, context) {
 
     let audience = event.Audience;
     let params = event.snsParam;
-  /*  let params = event;
-    try {
-        // Create promise and SNS service object
-        var data = await snsModule.publish(params).promise();
-        console.log(`Message ${params.Message} send sent to the topic ${params.TopicArn}`);
-        console.log("MessageID is " + data.MessageId);
-    
-        return { 
-            statusCode: 200,
-            messageId: data.MessageId
-        };
-    } catch (error) {
-        return {
-            statusCode: 400,
-            error: `Could not sent SNS notification [${params.Message}]`
-        };
-    }*/
 
-    try {
+    await notificationUtil.publishSNS(params);
+    await notificationUtil.publishWebSocket(audience, params.Message, TABLE_NAME, WEBSOCKET_ENDPOINT);
+
+    return { 
+        statusCode: 200//,
+       // messageId: data.MessageId
+    };
+/*    try {
         // Create promise and SNS service object
         var data = await snsModule.publish(params).promise();
         console.log(`Message ${params.Message} send sent to the topic ${params.TopicArn}`);
@@ -89,5 +81,5 @@ exports.handler = async function (event, context) {
     return { 
         statusCode: 200//,
        // messageId: data.MessageId
-    };
+    };*/
 };

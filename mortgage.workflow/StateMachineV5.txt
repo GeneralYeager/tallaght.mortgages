@@ -84,11 +84,21 @@
 			"Choices": [{
 				"Variable": "$.lambdaresult.statusCode",
 				"NumericEquals": 200,
-				"Next": "AutoAssessmentApprovalMessage"
+				"Next": "UpdateStatusToAutoApproved"
 			}],
 			"Default": "UpdateStatusToWithUnderwriter"
 		},
-		
+
+        "UpdateStatusToAutoApproved": {
+			"Type": "Task",
+          	"Parameters": {
+				"mortgage.$": "$.mortgage",
+				"newStatus": "Approved"
+			},
+			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-ChangeMortgageStatusFunction-2NK931AA2H2N",
+            "Next": "AutoAssessmentApprovalMessage"
+		},
+      
         "AutoAssessmentApprovalMessage": {
 			"Type": "Task",
 			"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-CreateNotificationMessageFunction-B9G86VUP45D8",

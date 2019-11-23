@@ -5,24 +5,59 @@ import { UnderwriterNotificationsService } from "../underwriter-notifications.se
 import { AlertService } from '../_alert';
 import { Subscription } from 'rxjs'
 
+import { Mortgage } from '../model/mortgage.model'
+import { MortgageApiService } from '../services/mortgage-api.service'
+import { animate, state, style, transition, trigger } from '@angular/animations';
+
+
 @Component({
   selector: 'app-underwriter-component',
   templateUrl: './underwriter-component.component.html',
   styleUrls: ['./underwriter-component.component.css'],
-  providers: [WebsocketService, UnderwriterNotificationsService]
+  providers: [WebsocketService, UnderwriterNotificationsService],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ] 
 })
 export class UnderwriterComponentComponent implements OnInit, OnDestroy {
 
   title = 'Tallaght Mortgages Underwriters Page';
   private subscription: Subscription;
 
-  constructor(private router: Router, private messagesService: UnderwriterNotificationsService, private alertService: AlertService) { 
+  columnsToDisplay: string[] = ['mortgageId', 'customerId', 'employerName', 'loanAmount', 'mortgageStatus', 'salary', 'term', 'yearsInEmployment'];
+  mortgageList: Mortgage[];// = ELEMENT_DATA;
+  expandedElement: Mortgage | null;
+
+  constructor(private router: Router, 
+              private messagesService: UnderwriterNotificationsService, 
+              private alertService: AlertService,
+              private mortgageApi: MortgageApiService) { 
   }
 
   ngOnInit() {
     this.subscription = this.messagesService.messages.subscribe(msg => {
-      console.log("Response from websocket: " + msg.message);
-      this.alertService.success(msg.message);
+      console.log("Underwriter websocket: " + msg.message);
+      if (msg.audience == 'Underwriter') this.alertService.success(msg.message);
+
+      this.loadMortgages();
+    });
+
+    this.loadMortgages();
+  }
+
+  refreshTable(event) {
+    event.preventDefault();
+    this.loadMortgages();
+  }
+
+  loadMortgages() {
+    this.mortgageApi.getMortgagesByStatus("WithUnderwriter").subscribe((data: Mortgage[]) => {
+      console.log(data);
+      this.mortgageList = data;
     });
   }
 

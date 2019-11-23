@@ -317,13 +317,34 @@ Resources:
     Properties:
       Handler: workflow/sendUnderwriterApprovalEmail.handler
       Runtime: nodejs10.x
-      Role: 
-        Ref: LambdaRoleParameter
+  #    Role: 
+   #     Ref: LambdaRoleParameter
       Environment:
         Variables:
           UNDERWRITER_DECISION_API: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/workflow/execution"
-#          UNDERWRITER_DECISION_API: !Join [ 'https://', [ !Ref ServerlessRestApi, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/Prod/workflow/execution'] ]
           UNDERWRITER_TOPIC_ARN: !Ref UnderwriterSNSTopic
+          TABLE_NAME: !Ref WebsocketConnectionTableName
+          WEBSOCKET_ENDPOINT: !Join [ '', [ !Ref MortgageWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/Prod'] ]
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref WebsocketConnectionTableName
+      - Statement:
+        - Effect: Allow
+          Action:
+          - 'sns:*'
+          Resource:
+          - '*'
+      - Statement:
+        - Effect: Allow
+          Action:
+          - 'execute-api:ManageConnections'
+          Resource:
+          - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${MortgageWebSocket}/*'
+    DependsOn:
+      - UnderwriterSNSTopic
+      - BrokerSNSTopic
+      - WebsocketConnectionsTable
+      - MortgageWebSocket
           
   ReceiveUnderwriterDecisionEmailFunction:
     Type: AWS::Serverless::Function

@@ -7,7 +7,7 @@ import { WebsocketService } from "./websocket.service";
 const CHAT_URL = "wss://h9uk1z65s6.execute-api.eu-west-1.amazonaws.com/Prod";
 
 export interface Message {
-  author: string;
+  audience: string;
   message: string;
 }
 
@@ -27,7 +27,7 @@ export class UnderwriterNotificationsService {
         console.log("in map");
         let data = JSON.parse(response.data);
         return {
-          author: data.author,
+          audience: data.audience,
           message: data.message
         };
       })
