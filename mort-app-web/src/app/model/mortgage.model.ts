@@ -6,4 +6,5 @@ export class Mortgage {
     term: string;
     salary: string;
     yearsInEmployment: string;
+    employerName: string;
 }

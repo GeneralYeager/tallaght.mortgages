@@ -10,17 +10,18 @@ import { MortgageApiService } from '../services/mortgage-api.service'
 })
 export class NewmortgageComponent implements OnInit {
   title = 'Create New Mortgage Page';
-
+  newMortgage : Mortgage = new Mortgage;
+  
   constructor(private router: Router, private mortgageApi: MortgageApiService) { }
-  private element : Mortgage = new Mortgage;
+  
 
   ngOnInit() {
   }
 
-  createMortgage(event) {
+  createMortgage(event, ) {
     event.preventDefault();
-    console.log(this.element);
-    this.mortgageApi.createMortgage(this.element).subscribe(data => {
+    console.log(this.newMortgage);
+    this.mortgageApi.createMortgage(this.newMortgage).subscribe(data => {
       console.log(data);
       this.router.navigate(['/brokers'])
     });

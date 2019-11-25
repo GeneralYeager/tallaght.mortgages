@@ -3,28 +3,28 @@
 <form class="example-form">
     
     <td><mat-form-field class="example-full-width">
-        <input matInput placeholder="Customer Number" [(ngModel)]="element.customerId" name="customerId">
+        <input matInput placeholder="Customer Number" [(ngModel)]="newMortgage.customerId" name="customerId">
     </mat-form-field></td>
 
     <table class="example-full-width" cellspacing="0"><tr>
       <td><mat-form-field class="example-full-width">
-        <input matInput placeholder="Employers Name" [(ngModel)]="element.employerName" name="employerName">
+        <input matInput placeholder="Employers Name" [(ngModel)]="newMortgage.employerName" name="employerName">
       </mat-form-field></td>
       <td><mat-form-field class="example-full-width">
-        <input matInput placeholder="Years in Employments"  [(ngModel)]="element.yearsInEmployment" name="yearsInEmployment">
+        <input matInput placeholder="Years in Employments"  [(ngModel)]="newMortgage.yearsInEmployment" name="yearsInEmployment">
       </mat-form-field></td>
       <td><mat-form-field class="example-full-width">
-        <input matInput placeholder="Salary"  [(ngModel)]="element.salary" name="salary">
+        <input matInput placeholder="Salary"  [(ngModel)]="newMortgage.salary" name="salary">
       </mat-form-field></td>
     </tr></table>
   
     
     <table class="example-full-width" cellspacing="0"><tr>
       <td><mat-form-field class="example-full-width">
-        <input matInput placeholder="Loan Amount" [(ngModel)]="element.loanAmount" name="loanAmount">
+        <input matInput placeholder="Loan Amount" [(ngModel)]="newMortgage.loanAmount" name="loanAmount">
       </mat-form-field></td>
       <td><mat-form-field class="example-full-width">
-        <input matInput placeholder="Term (Years)" [(ngModel)]="element.term" name="term">
+        <input matInput placeholder="Term (Years)" [(ngModel)]="newMortgage.term" name="term">
       </mat-form-field></td>
     </tr></table>
     <a href="" class="button" mat-button (click)="createMortgage($event)">Create</a>

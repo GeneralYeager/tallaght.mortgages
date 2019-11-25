@@ -61,6 +61,14 @@ export class UnderwriterComponentComponent implements OnInit, OnDestroy {
     });
   }
 
+  approveMortgage(event, mortgage) {
+    event.preventDefault();
+  }
+
+  declineMortgage(event, mortgage) {
+    event.preventDefault();
+  }
+
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
