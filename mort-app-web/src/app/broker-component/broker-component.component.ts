@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Mortgage } from '../model/mortgage.model'
 import { MortgageApiService } from '../services/mortgage-api.service'
@@ -20,7 +20,7 @@ import { Subscription } from 'rxjs'
     ]),
   ],
 })
-export class BrokerComponentComponent implements OnInit {
+export class BrokerComponentComponent implements OnInit, OnDestroy {
 
   title = 'Tallaght Mortgages Brokers Page';
 
@@ -84,5 +84,10 @@ export class BrokerComponentComponent implements OnInit {
       window.alert("Update Completed");
     });
   }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
   
 }
