@@ -96,6 +96,32 @@ export class MortgageApiService {
     )
   }
 
+  approveMortgage(id) {
+    const approvalDecision = {
+      mortgageId: id,
+      action: "approve"
+    };
+  
+    return this.http.post<String>(this.apiURL + '/workflow/execution/', JSON.stringify(approvalDecision), this.httpOptions)
+      .pipe(
+        retry(this.numRetries),
+        catchError(this.handleError)
+    )
+  }
+
+  declineMortgage(id) {
+    const rejectionDecision = {
+      mortgageId: id,
+      action: "reject"
+    };
+  
+    return this.http.post<String>(this.apiURL + '/workflow/execution/', JSON.stringify(rejectionDecision), this.httpOptions)
+      .pipe(
+        retry(this.numRetries),
+        catchError(this.handleError)
+    )
+  }
+
   // Error handling
   handleError(error) {
     let errorMessage = '';

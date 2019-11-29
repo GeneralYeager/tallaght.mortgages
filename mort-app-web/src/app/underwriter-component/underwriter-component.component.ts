@@ -63,10 +63,18 @@ export class UnderwriterComponentComponent implements OnInit, OnDestroy {
 
   approveMortgage(event, mortgage) {
     event.preventDefault();
+    this.mortgageApi.approveMortgage(mortgage.mortgageId).subscribe((data) => {
+      console.log(data);
+      this.loadMortgages();
+    });
   }
 
   declineMortgage(event, mortgage) {
     event.preventDefault();
+    this.mortgageApi.declineMortgage(mortgage.mortgageId).subscribe((data) => {
+      console.log(data);
+      this.loadMortgages();
+    });
   }
 
   ngOnDestroy() {
