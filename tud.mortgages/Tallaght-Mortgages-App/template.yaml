@@ -175,13 +175,9 @@ Resources:
       AttributeDefinitions:
         - AttributeName: "mortgageId"
           AttributeType: "S"
- #     - AttributeName: "stepFunctionToken"
- #       AttributeType: "S"
       KeySchema:
         - AttributeName: "mortgageId"
           KeyType: "HASH"
- #     - AttributeName: "stepFunctionToken"
- #       KeyType: "RANGE"
 #      ProvisionedThroughput:
 #        ReadCapacityUnits: 5
 #        WriteCapacityUnits: 5
@@ -315,19 +311,20 @@ Resources:
   SendUnderwriterDecisionEmailFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: workflow/sendUnderwriterApprovalEmail.handler
+      Handler: workflow/startUnderwriterDecisionProcess.handler
       Runtime: nodejs10.x
-  #    Role: 
-   #     Ref: LambdaRoleParameter
       Environment:
         Variables:
           UNDERWRITER_DECISION_API: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/workflow/execution"
           UNDERWRITER_TOPIC_ARN: !Ref UnderwriterSNSTopic
-          TABLE_NAME: !Ref WebsocketConnectionTableName
+          WEBSOCKET_TABLE_NAME: !Ref WebsocketConnectionTableName
           WEBSOCKET_ENDPOINT: !Join [ '', [ !Ref MortgageWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/Prod'] ]
+          STEP_FUNCTION_TABLE_NAME: !Ref StepFunctionTokenTableName
       Policies:
       - DynamoDBCrudPolicy:
           TableName: !Ref WebsocketConnectionTableName
+      - DynamoDBCrudPolicy:
+          TableName: !Ref StepFunctionTokenTableName
       - Statement:
         - Effect: Allow
           Action:
@@ -345,20 +342,45 @@ Resources:
       - BrokerSNSTopic
       - WebsocketConnectionsTable
       - MortgageWebSocket
+      - StepFunctionTokenTable
           
-  ReceiveUnderwriterDecisionEmailFunction:
+  ReceiveUnderwriterDecisionGETFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: workflow/receiveUnderwriterDecision.handler
+      Handler: workflow/underwriterDecisionGET.handler
       Runtime: nodejs10.x
       Role: 
         Ref: LambdaRoleParameter
       Events:
-        UnderwriterDecisionEvent:
+        UnderwriterDecisionGETEvent:
           Type: Api
           Properties:
             Path: /workflow/execution
             Method: GET
+      Environment:
+        Variables:
+          STEP_FUNCTION_TABLE_NAME: !Ref StepFunctionTokenTableName
+    DependsOn:
+      - StepFunctionTokenTable
+      
+  ReceiveUnderwriterDecisionPOSTFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: workflow/underwriterDecisionPOST.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+      Events:
+        UnderwriterDecisionPOSTEvent:
+          Type: Api
+          Properties:
+            Path: /workflow/execution
+            Method: POST
+      Environment:
+        Variables:
+          STEP_FUNCTION_TABLE_NAME: !Ref StepFunctionTokenTableName
+    DependsOn:
+      - StepFunctionTokenTable
 
   # WEBSOCKET APIS
   MortgageWebSocket:
