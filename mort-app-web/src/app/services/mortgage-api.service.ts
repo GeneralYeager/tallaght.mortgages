@@ -12,7 +12,7 @@ export class MortgageApiService {
   private numRetries = 0;
 
   // Define API
-  apiURL = 'https://14c5jip7sg.execute-api.eu-west-1.amazonaws.com/Prod';
+  apiURL = 'https://t6hcs10sv6.execute-api.eu-west-1.amazonaws.com/Prod';
 
   constructor(private http: HttpClient) { }
 

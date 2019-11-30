@@ -41,7 +41,15 @@ export class UnderwriterComponentComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.subscription = this.messagesService.messages.subscribe(msg => {
       console.log("Underwriter websocket: " + msg.message);
-      if (msg.audience == 'Underwriter') this.alertService.success(msg.message);
+      console.log("Underwriter websocket: " + msg.AlertType);
+      if (msg.audience == 'Underwriter') {
+        if (msg.AlertType == "Success")
+          this.alertService.success(msg.message);
+        else if (msg.AlertType == "Error")
+          this.alertService.error(msg.message);
+        else 
+          this.alertService.warn(msg.message);
+      }
 
       this.loadMortgages();
     });
@@ -66,6 +74,7 @@ export class UnderwriterComponentComponent implements OnInit, OnDestroy {
     this.mortgageApi.approveMortgage(mortgage.mortgageId).subscribe((data) => {
       console.log(data);
       this.loadMortgages();
+      alert(data);
     });
   }
 
@@ -74,6 +83,7 @@ export class UnderwriterComponentComponent implements OnInit, OnDestroy {
     this.mortgageApi.declineMortgage(mortgage.mortgageId).subscribe((data) => {
       console.log(data);
       this.loadMortgages();
+      alert(data);
     });
   }
 

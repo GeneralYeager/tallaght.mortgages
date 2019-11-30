@@ -39,7 +39,14 @@ export class BrokerComponentComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.subscription = this.messagesService.messages.subscribe(msg => {
       console.log("Broker from websocket: " + msg.message);
-      if (msg.audience == 'Broker') this.alertService.success(msg.message);
+      if (msg.audience == 'Broker') {
+        if (msg.AlertType == "Success")
+          this.alertService.success(msg.message);
+        else if (msg.AlertType == "Error")
+          this.alertService.error(msg.message);
+        else 
+          this.alertService.warn(msg.message);
+      }
       
       this.loadMortgages();
     });

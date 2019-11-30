@@ -41,6 +41,7 @@ function mortgageNotFoundMessage(mortgageId) {
 
     return {
         Audience: AUDIENCE_BROKER,
+        AlertType: "Error",
         snsParam: {
             Subject: `Mortgage [${mortgageId}] Error.`,
             Message: `The Mortgage [${mortgageId}] cannot be found on the system. The Approval process will exit.`,
@@ -53,6 +54,7 @@ function autoAssessmentMessage(mortgage) {
 
     return {
         Audience: AUDIENCE_BROKER,
+        AlertType: "Warning",
         snsParam: {
             Subject: `Mortgage [${mortgage.mortgageId}] Auto Assessment.`,
             Message: `The Mortgage [${mortgage.mortgageId}] is currently undergoing Auto Assessment.`,
@@ -65,6 +67,7 @@ function autoApprovalMessage(mortgage) {
 
     return {
         Audience: AUDIENCE_BROKER,
+        AlertType: "Success",
         snsParam: {
             Subject: `Mortgage [${mortgage.mortgageId}] Auto Assessment - Passed.`,
             Message: `The Mortgage [${mortgage.mortgageId}] has been Approved by the Auto Assessment process.`,
@@ -77,6 +80,7 @@ function autoRejectionMessage(mortgage) {
 
     return {
         Audience: AUDIENCE_BROKER,
+        AlertType: "Warning",
         snsParam: {
             Subject: `Mortgage [${mortgage.mortgageId}] Auto Assessment - Referred.`,
             Message: `The Mortgage [${mortgage.mortgageId}] has been referred to an Underwriter for further review.`,
@@ -89,6 +93,7 @@ function underwriterApprovalMessage(mortgage) {
 
     return {
         Audience: AUDIENCE_BROKER,
+        AlertType: "Success",
         snsParam: {
             Subject: `Mortgage [${mortgage.mortgageId}] Approval.`,
             Message: `The Mortgage [${mortgage.mortgageId}] has been approved by the Underwriter.`,
@@ -101,6 +106,7 @@ function underwriterRejectionMessage(mortgage) {
 
     return {
         Audience: AUDIENCE_BROKER,
+        AlertType: "Error",
         snsParam: {
             Subject: `Mortgage [${mortgage.mortgageId}] Rejection.`,
             Message: `The Mortgage [${mortgage.mortgageId}] has been rejected by the Underwriter.`,

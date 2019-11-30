@@ -33,7 +33,7 @@ exports.publishSNS = async function (params) {
     };
 };
 
-exports.publishWebSocket = async function (audience, message, TABLE_NAME, WEBSOCKET_ENDPOINT) {
+exports.publishWebSocket = async function (audience, message, severity, TABLE_NAME, WEBSOCKET_ENDPOINT) {
 
         try {
             let connectionData = await ddb.scan({ TableName: TABLE_NAME, ProjectionExpression: 'connectionId' }).promise();
@@ -47,6 +47,7 @@ exports.publishWebSocket = async function (audience, message, TABLE_NAME, WEBSOC
             //const postData = '{\"author\": \"1212121", \"message\": \"Mortgage 1212121 is now Auto Approved"}';
             const websocketMessage = {
                 audience: audience,
+                AlertType: severity,
                 message: message
             };
     

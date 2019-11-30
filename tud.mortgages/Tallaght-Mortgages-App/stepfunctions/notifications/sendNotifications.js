@@ -14,9 +14,10 @@ exports.handler = async function (event, context) {
 
     let audience = event.Audience;
     let params = event.snsParam;
+    let AlertType = event.AlertType;
 
     await notificationUtil.publishSNS(params);
-    await notificationUtil.publishWebSocket(audience, params.Message, TABLE_NAME, WEBSOCKET_ENDPOINT);
+    await notificationUtil.publishWebSocket(audience, params.Message, AlertType, TABLE_NAME, WEBSOCKET_ENDPOINT);
 
     return { 
         statusCode: 200//,
