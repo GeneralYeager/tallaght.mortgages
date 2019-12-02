@@ -33,7 +33,8 @@ export class BrokerComponentComponent implements OnInit, OnDestroy {
   constructor(private router: Router, 
               private mortgageApi: MortgageApiService,
               private messagesService: UnderwriterNotificationsService, 
-              private alertService: AlertService) {     
+              private alertService: AlertService) { 
+                console.log("construct Broker Component");
   }
 
   ngOnInit() {

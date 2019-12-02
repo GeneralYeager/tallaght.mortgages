@@ -36,6 +36,7 @@ export class UnderwriterComponentComponent implements OnInit, OnDestroy {
               private messagesService: UnderwriterNotificationsService, 
               private alertService: AlertService,
               private mortgageApi: MortgageApiService) { 
+                console.log("construct Underwriter Component");
   }
 
   ngOnInit() {
