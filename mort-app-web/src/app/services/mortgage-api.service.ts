@@ -122,6 +122,21 @@ export class MortgageApiService {
     )
   }
 
+  
+  submitClarification(id, txt) {
+    const clarificationDecision = {
+      mortgageId: id,
+      action: "clarify",
+      clarificationQuestion: txt
+    };
+  
+    return this.http.post<String>(this.apiURL + '/workflow/execution/', JSON.stringify(clarificationDecision), this.httpOptions)
+      .pipe(
+        retry(this.numRetries),
+        catchError(this.handleError)
+    )
+  }
+
   // Error handling
   handleError(error) {
     let errorMessage = '';

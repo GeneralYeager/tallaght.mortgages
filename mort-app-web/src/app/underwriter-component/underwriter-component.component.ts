@@ -95,4 +95,9 @@ export class UnderwriterComponentComponent implements OnInit, OnDestroy {
   goToHomePage(event) {
     this.router.navigate(['/home'])
   }  
+
+  goToClarification(event, mortgageId) {
+    console.log("/underwriters/clarification/"+mortgageId);
+    this.router.navigate(['/underwriters/clarification/'+mortgageId]);
+  }
 }

@@ -11,22 +11,24 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatTabsModule} from '@angular/material/tabs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-import { MatTableModule } from '@angular/material/table'
+import { MatTableModule } from '@angular/material/table';
 
 import { AlertModule } from './_alert';
 
 import { HttpClientModule } from '@angular/common/http';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NewmortgageComponent } from './newmortgage/newmortgage.component';
+import { UnderwritingClarificationComponent } from './underwriting-clarification/underwriting-clarification.component';
 @NgModule({
   declarations: [
     AppComponent,
     UnderwriterComponentComponent,
     BrokerComponentComponent,
     HomeComponent,
-    NewmortgageComponent
+    NewmortgageComponent,
+    UnderwritingClarificationComponent
   ],
   imports: [
     BrowserModule,
@@ -39,7 +41,8 @@ import { NewmortgageComponent } from './newmortgage/newmortgage.component';
     AlertModule,
     MatFormFieldModule,
     MatInputModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
   providers: [HttpClientModule],
   bootstrap: [AppComponent]

@@ -6,7 +6,7 @@ const stepTokenUtil = require("./utils/restartWorkflow.js");
 const stepfunctions = new AWS.StepFunctions();
 const dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
 
-const { STEP_FUNCTION_TABLE_NAME } = process.env;
+const { STEP_FUNCTION_TABLE_NAME, CLARIFICATION_TABLE_NAME } = process.env;
 
 
 exports.handler = async (event, context, callback) => {
@@ -24,6 +24,17 @@ exports.handler = async (event, context, callback) => {
     //const mortgageId = event.queryStringParameters.mortgageId;
     try {
         
+        if (decision.action == "clarify") {
+            var clarParam = {
+                TableName: CLARIFICATION_TABLE_NAME,
+                Item: {
+                    'mortgageId': decision.mortgageId,
+                    'clarificationText': decision.clarification
+                }
+            };   
+            await dynamoDB.put(clarParam).promise();
+        }
+
         var dbTokenParam = {
             TableName: STEP_FUNCTION_TABLE_NAME,
             Key: {

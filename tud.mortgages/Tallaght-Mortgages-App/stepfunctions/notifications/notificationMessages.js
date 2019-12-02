@@ -29,6 +29,9 @@ exports.handler = async function (event, context) {
         case "underwriterRejectionMessage":
             message = underwriterRejectionMessage(event.mortgage);
             break;
+        case "clarificationRequestMessage":
+            message = clarificationRequestMessage(event.mortgage);
+            break;
         default:
             message = {statusCode:500};
             break;
@@ -36,6 +39,18 @@ exports.handler = async function (event, context) {
     console.log(message);
     return message;
 };
+
+function clarificationRequestMessage(mortgageId) {
+    return {
+        Audience: AUDIENCE_BROKER,
+        AlertType: "Warning",
+        snsParam: {
+            Subject: `Mortgage [${mortgageId.mortgageId}] Requires Clarification.`,
+            Message: `The Underwriter has requested clarification about certain aspects of Mortgage [${mortgage.mortgageId}].`,
+            TopicArn: BROKER_TOPIC_ARN
+        }
+    };
+}
 
 function mortgageNotFoundMessage(mortgageId) {
 

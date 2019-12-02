@@ -27,7 +27,12 @@ Parameters:
   StepFunctionTokenTableName:
     Type: String
     Default: 'STEPFUNCTION_TOKEN_TABLE'
+  ClarificationsTableName:
+    Type: String
+    Default: 'CLARIFICATION_TABLE'
     
+
+
 Resources:
 
   # SNS TOPICS
@@ -48,7 +53,17 @@ Resources:
           Protocol: email
       TopicName: BrokerSNSTopic
 
- 
+  ClarificationsTable:
+    Type: AWS::DynamoDB::Table  
+    Properties:
+      TableName: !Ref ClarificationsTableName
+      AttributeDefinitions:
+        - AttributeName: "mortgageId"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "mortgageId"
+          KeyType: "HASH"
+      BillingMode: PAY_PER_REQUEST
 
   # CUSTOMER APIS
   GetCustomerFunction:
@@ -378,8 +393,32 @@ Resources:
       Environment:
         Variables:
           STEP_FUNCTION_TABLE_NAME: !Ref StepFunctionTokenTableName
+          CLARIFICATION_TABLE_NAME: !Ref ClarificationsTableName
     DependsOn:
       - StepFunctionTokenTable
+      - ClarificationsTable
+
+
+  # CLARIFICATIONS API    
+  UnderwriterClarificationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: clarifications/underwriterClarification.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+      Events:
+        UnderwriterClarificationEvent:
+          Type: Api
+          Properties:
+            Path: /clarification
+            Method: POST
+      Environment:
+        Variables:
+          CLARIFICATION_TABLE_NAME: !Ref ClarificationsTableName
+    DependsOn:
+      - ClarificationsTable
+
 
   # WEBSOCKET APIS
   MortgageWebSocket:

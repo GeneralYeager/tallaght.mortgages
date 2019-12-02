@@ -19,6 +19,11 @@ exports.restartWorkflow = async function (mortgageId, taskToken, action) {
                 statusCode: 500,
                 Status: `Mortgage [${mortgageId}] Rejected!` 
             };
+        } else if (action === "clarify") {
+            decision = { 
+                statusCode: 400,
+                Status: `Mortgage [${mortgageId}] requires Clarification!` 
+            };
         } else {
             console.error("Unrecognized action. Expected: approve, reject.");
             callback({"Status": "Failed to process the request. Unrecognized Action."});
