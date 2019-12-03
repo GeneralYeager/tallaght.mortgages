@@ -4,13 +4,13 @@ const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-depe
 
 const ddb = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
 
-const { TABLE_NAME } = process.env;
+const { CLARIFICATION_TABLE_NAME } = process.env;
 
 exports.queryClarifications = async function (mortgageId) {
 
     try {
         var clarificationParams = {
-            TableName : TABLE_NAME,
+            TableName : CLARIFICATION_TABLE_NAME,
             KeyConditionExpression: "mortgageId = :mortId",
             ExpressionAttributeValues: {
                 ":mortId": mortgageId
@@ -31,7 +31,7 @@ exports.addClarification = async function (mortgageId, currMessageId, text) {
 
   try {
     var newMessage = {
-      TableName: TABLE_NAME,
+      TableName: CLARIFICATION_TABLE_NAME,
       Item: {
         "mortgageId": mortgageId,
         "messageId": currMessageId + 1,

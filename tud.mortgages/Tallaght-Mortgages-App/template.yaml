@@ -53,21 +53,59 @@ Resources:
           Protocol: email
       TopicName: BrokerSNSTopic
 
-  ClarificationsTable:
-    Type: AWS::DynamoDB::Table  
+ # ClarificationsTable:
+   # Type: AWS::DynamoDB::Table  
+    #Properties:
+    #  TableName: !Ref ClarificationsTableName
+   #   AttributeDefinitions:
+   #     - AttributeName: "mortgageId"
+   #       AttributeType: "S"
+   #     - AttributeName: "messageId"
+    #      AttributeType: "N"
+   #   KeySchema:
+   #     - AttributeName: "mortgageId"
+  #        KeyType: "HASH"
+   #     - AttributeName: "messageId"
+    #      KeyType: "RANGE"
+    #  BillingMode: PAY_PER_REQUEST
+
+  # CLARIFICATIONS APIs
+  GetClarificationsFunction:
+    Type: AWS::Serverless::Function
     Properties:
-      TableName: !Ref ClarificationsTableName
-      AttributeDefinitions:
-        - AttributeName: "mortgageId"
-          AttributeType: "S"
-        - AttributeName: "messageId"
-          AttributeType: "N"
-      KeySchema:
-        - AttributeName: "mortgageId"
-          KeyType: "HASH"
-        - AttributeName: "messageId"
-          KeyType: "RANGE"
-      BillingMode: PAY_PER_REQUEST
+      CodeUri: clarifications/
+      Handler: getClarifications.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+      Events:
+        GetCustomerEvent:
+          Type: Api
+          Properties:
+            Path: /clarifications/{id}
+            Method: GET
+      Environment:
+        Variables:
+          CLARIFICATION_TABLE_NAME: !Ref ClarificationsTableName
+  AddClarificationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: clarifications/
+      Handler: addClarification.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+      Events:
+        CreateCustomerEvent:
+          Type: Api
+          Properties:
+            Path: /clarifications/
+            Method: POST
+      Environment:
+        Variables:
+          CLARIFICATION_TABLE_NAME: !Ref ClarificationsTableName
+
+
 
   # CUSTOMER APIS
   GetCustomerFunction:
@@ -400,28 +438,28 @@ Resources:
           CLARIFICATION_TABLE_NAME: !Ref ClarificationsTableName
     DependsOn:
       - StepFunctionTokenTable
-      - ClarificationsTable
+  #    - ClarificationsTable
 
 
   # CLARIFICATIONS API    
-  UnderwriterClarificationFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: clarifications/underwriterClarification.handler
-      Runtime: nodejs10.x
-      Role: 
-        Ref: LambdaRoleParameter
-      Events:
-        UnderwriterClarificationEvent:
-          Type: Api
-          Properties:
-            Path: /clarification
-            Method: POST
-      Environment:
-        Variables:
-          CLARIFICATION_TABLE_NAME: !Ref ClarificationsTableName
-    DependsOn:
-      - ClarificationsTable
+ # UnderwriterClarificationFunction:
+ #   Type: AWS::Serverless::Function
+ #   Properties:
+  ##    Handler: clarifications/underwriterClarification.handler
+  #    Runtime: nodejs10.x
+  #   Role: 
+   #     Ref: LambdaRoleParameter
+   #   Events:
+    #    UnderwriterClarificationEvent:
+    #      Type: Api
+    #      Properties:
+    #        Path: /clarification
+    #        Method: POST
+   #   Environment:
+   #     Variables:
+   #       CLARIFICATION_TABLE_NAME: !Ref ClarificationsTableName
+ #   DependsOn:
+   #   - ClarificationsTable
 
 
   # WEBSOCKET APIS

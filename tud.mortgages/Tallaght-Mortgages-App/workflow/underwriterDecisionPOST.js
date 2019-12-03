@@ -24,7 +24,7 @@ exports.handler = async (event, context, callback) => {
     //const mortgageId = event.queryStringParameters.mortgageId;
     try {
         
-        if (decision.action == "clarify") {
+     /*   if (decision.action == "clarify") {
             var clarParam = {
                 TableName: CLARIFICATION_TABLE_NAME,
                 Item: {
@@ -34,7 +34,7 @@ exports.handler = async (event, context, callback) => {
             };   
             await dynamoDB.put(clarParam).promise();
         }
-
+*/
         var dbTokenParam = {
             TableName: STEP_FUNCTION_TABLE_NAME,
             Key: {
