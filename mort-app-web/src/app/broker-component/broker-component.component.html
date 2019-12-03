@@ -40,11 +40,9 @@
                 <input matInput placeholder="Term (Years)" [(ngModel)]="element.term" name="term">
               </mat-form-field></td>
             </tr></table>
-<!--            <a href="" class="button" mat-button (click)="updateMortgage($event, element)">Save</a>-->
             <button mat-button (click)="updateMortgage($event, element)">Save</button>
-<!--            <a *ngIf="element.mortgageStatus=='PreSubmission'" href="" class="button" mat-button (click)="submitForApproval($event, element)">Submit For Approval</a>-->
             <button *ngIf="element.mortgageStatus=='PreSubmission'" mat-button (click)="submitForApproval($event, element)">Submit For Approval</button>
-
+            <button *ngIf="element.mortgageStatus=='ClarificationRequested'" mat-button (click)="goToClarification($event, element)">Respond to Clarification</button>
           </form>
 
       </div>

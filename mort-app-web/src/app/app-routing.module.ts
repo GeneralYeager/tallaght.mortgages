@@ -5,12 +5,14 @@ import { BrokerComponentComponent } from './broker-component/broker-component.co
 import { HomeComponent } from './home/home.component';
 import { NewmortgageComponent } from './newmortgage/newmortgage.component';
 import { UnderwritingClarificationComponent } from './underwriting-clarification/underwriting-clarification.component'
+import { BrokerClarificationComponent } from './brokerclarification/broker-clarification.component'
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'underwriters', component: UnderwriterComponentComponent },
   { path: 'underwriters/clarification/:id', component: UnderwritingClarificationComponent },
   { path: 'brokers', component: BrokerComponentComponent },
+  { path: 'brokers/clarification/:id', component: BrokerClarificationComponent },
   { path: 'brokers/newmortgage', component: NewmortgageComponent },
   { path: '**', redirectTo: '/home', pathMatch: 'full' }
 ];

@@ -93,6 +93,11 @@ export class BrokerComponentComponent implements OnInit, OnDestroy {
     });
   }
 
+  goToClarification(event, mortgage) {
+    console.log("brokers/clarification/"+mortgage.mortgageId);
+    this.router.navigate(['/brokers/clarification/'+mortgage.mortgageId]);
+  }
+
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }

@@ -60,9 +60,13 @@ Resources:
       AttributeDefinitions:
         - AttributeName: "mortgageId"
           AttributeType: "S"
+        - AttributeName: "messageId"
+          AttributeType: "N"
       KeySchema:
         - AttributeName: "mortgageId"
           KeyType: "HASH"
+        - AttributeName: "messageId"
+          KeyType: "RANGE"
       BillingMode: PAY_PER_REQUEST
 
   # CUSTOMER APIS
