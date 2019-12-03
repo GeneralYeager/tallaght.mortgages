@@ -93,10 +93,12 @@ export class UnderwriterComponentComponent implements OnInit, OnDestroy {
   }
 
   goToHomePage(event) {
+    event.preventDefault();
     this.router.navigate(['/home'])
   }  
 
   goToClarification(event, mortgageId) {
+    event.preventDefault();
     console.log("/underwriters/clarification/"+mortgageId);
     this.router.navigate(['/underwriters/clarification/'+mortgageId]);
   }

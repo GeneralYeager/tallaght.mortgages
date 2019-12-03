@@ -40,12 +40,12 @@ exports.handler = async function (event, context) {
     return message;
 };
 
-function clarificationRequestMessage(mortgageId) {
+function clarificationRequestMessage(mortgage) {
     return {
         Audience: AUDIENCE_BROKER,
         AlertType: "Warning",
         snsParam: {
-            Subject: `Mortgage [${mortgageId.mortgageId}] Requires Clarification.`,
+            Subject: `Mortgage [${mortgage.mortgageId}] Requires Clarification.`,
             Message: `The Underwriter has requested clarification about certain aspects of Mortgage [${mortgage.mortgageId}].`,
             TopicArn: BROKER_TOPIC_ARN
         }

@@ -21,6 +21,11 @@ import {MatInputModule} from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NewmortgageComponent } from './newmortgage/newmortgage.component';
 import { UnderwritingClarificationComponent } from './underwriting-clarification/underwriting-clarification.component';
+
+import { BrokerClarificationComponent } from './brokerclarification/broker-clarification.component';
+
+import {MatCardModule} from '@angular/material/card';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -28,7 +33,8 @@ import { UnderwritingClarificationComponent } from './underwriting-clarification
     BrokerComponentComponent,
     HomeComponent,
     NewmortgageComponent,
-    UnderwritingClarificationComponent
+    UnderwritingClarificationComponent,
+    BrokerClarificationComponent
   ],
   imports: [
     BrowserModule,
@@ -42,7 +48,8 @@ import { UnderwritingClarificationComponent } from './underwriting-clarification
     MatFormFieldModule,
     MatInputModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatCardModule
   ],
   providers: [HttpClientModule],
   bootstrap: [AppComponent]

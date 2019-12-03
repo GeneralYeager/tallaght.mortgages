@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Mortgage } from '../model/Mortgage.model';
+import { Clarification } from '../model/clarification.model';
 import { Observable, throwError } from 'rxjs';
-import { retry, catchError } from 'rxjs/operators';
+import { retry, catchError, mergeMap  } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -122,18 +123,40 @@ export class MortgageApiService {
     )
   }
 
-  
-  submitClarification(id, txt) {
-    const clarificationDecision = {
+  clarifyMortgage(id) {
+    const clarifyDecision = {
       mortgageId: id,
-      action: "clarify",
-      clarificationQuestion: txt
+      action: "clarify"
     };
   
-    return this.http.post<String>(this.apiURL + '/workflow/execution/', JSON.stringify(clarificationDecision), this.httpOptions)
+    return this.http.post<String>(this.apiURL + '/workflow/execution/', JSON.stringify(clarifyDecision), this.httpOptions)
       .pipe(
         retry(this.numRetries),
         catchError(this.handleError)
+    )
+  }
+
+  
+  submitClarification(id, txt): Observable<String> {
+    const clarificationDecision = {
+      mortgageId: id,
+      text: txt
+    };
+  
+    return this.http.post<String>(this.apiURL + '/clarifications/', JSON.stringify(clarificationDecision), this.httpOptions)
+      .pipe(
+        retry(this.numRetries),
+        catchError(this.handleError)
+    )
+  }
+
+
+  getClarifications(mortgageId) {
+  
+    return this.http.get<Clarification[]>(this.apiURL + '/clarifications/' + mortgageId)
+    .pipe(
+      retry(this.numRetries),
+      catchError(this.handleError)
     )
   }
 

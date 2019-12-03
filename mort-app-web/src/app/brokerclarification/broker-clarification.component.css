@@ -1,9 +1,14 @@
 .example-container {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .example-container > * {
-    width: 60%;
-  }
+  display: flex;
+  flex-direction: column;
+}
+
+.example-container > * {
+  width: 60%;
+}
+
+.example-card {
+  width: 60%;
+}
+
   

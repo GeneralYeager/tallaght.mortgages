@@ -1,9 +1,20 @@
-  <div class="example-container">
-    <mat-form-field>
-        <textarea matInput placeholder="Type the clarification question here." [(ngModel)]="clarificationText" name=clarText></textarea>
-    </mat-form-field>
+<button mat-button type="button" (click)="backButton($event)">Back</button>
+<br>
 
-    
-
+<div *ngFor="let c of clarificationList">
+<mat-card class="example-card" >
+  <mat-card-content>
+    <p>
+      {{c.text}}
+    </p>
+  </mat-card-content>
+</mat-card>
+<br>
 </div>
-<button mat-button (click)="submitClarification($event)">Submit Clarification</button>
+
+ <div class="example-container">
+    <mat-form-field>
+        <textarea matInput placeholder="Type here." [(ngModel)]="newClarificationText" name=newClarText></textarea>
+    </mat-form-field>
+</div>
+<button mat-button type="button" (click)="submitClarification($event)">Submit Clarification</button>

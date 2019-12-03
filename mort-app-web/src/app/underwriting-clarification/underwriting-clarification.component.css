@@ -6,4 +6,8 @@
   .example-container > * {
     width: 60%;
   }
+
+  .example-card {
+    width: 60%;
+  }
   

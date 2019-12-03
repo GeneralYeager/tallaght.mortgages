@@ -4,6 +4,8 @@ import { switchMap } from 'rxjs/operators';
 import { MortgageApiService } from '../services/mortgage-api.service'
 import {MatInputModule} from '@angular/material';
 import { of } from 'rxjs';
+import { Clarification } from '../model/clarification.model'
+import {MatCardModule} from '@angular/material/card';
 
 @Component({
   selector: 'app-underwriting-clarification',
@@ -13,7 +15,8 @@ import { of } from 'rxjs';
 export class UnderwritingClarificationComponent implements OnInit, OnDestroy {
 
   mortgageId: string;
-  clarificationQuestion: string;
+  clarificationList: Clarification[];
+  newClarificationText: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -22,21 +25,35 @@ export class UnderwritingClarificationComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.route.params.subscribe(
-      (params: Params) => {
-        this.mortgageId = params['id'];
-      }
-    );
+    this.mortgageId = this.route.snapshot.paramMap.get('id');
+    this.mortgageApi.getClarifications(this.mortgageId).subscribe((data) => {
+      console.log(data);
+      this.clarificationList = data;
+    });
   }
 
   ngOnDestroy() {
   }
 
   submitClarification(event) {
-    this.mortgageApi.submitClarification(this.mortgageId, this.clarificationQuestion).subscribe((data) => {
+    event.preventDefault();
+    this.mortgageApi.submitClarification(this.mortgageId, this.newClarificationText).subscribe((data) => {
       console.log(data);
-      alert(data);
+      this.mortgageApi.clarifyMortgage(this.mortgageId).subscribe((data1) => {
+        console.log(data1);
+        this.backToUnderwriting();
+      });
     });
+  }
+
+  
+  backButton(event) {
+    event.preventDefault();
+    this.backToUnderwriting()
+  }
+  
+  backToUnderwriting() {
+    this.router.navigate(['/underwriters/']);
   }
 
 }
