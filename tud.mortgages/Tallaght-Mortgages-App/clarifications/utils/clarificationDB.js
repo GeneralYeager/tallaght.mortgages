@@ -47,22 +47,18 @@ exports.addClarification = async function (mortgageId, currMessageId, text) {
   }
 };
 
-exports.deleteClarifications = async function (mortgageId) {
+exports.deleteClarifications = async function (clarification) {
 
   try {
     var params = {
-      RequestItems: {
-        CLARIFICATION_TABLE_NAME: [
-          {
-            DeleteRequest: {
-              Key: { HashKey: mortgageId }
-            }
-          }
-        ]
+      TableName: CLARIFICATION_TABLE_NAME,
+      Key: {
+        'mortgageId' : clarification.mortgageId,
+        'messageId' : clarification.messageId
       }
     };
  
-    const deleteResult = await ddb.batchWrite(params);
+    const deleteResult = await ddb.delete(params).promise();
     return deleteResult;
   } catch (error) {
       console.log(error);

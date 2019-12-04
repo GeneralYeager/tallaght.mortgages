@@ -136,6 +136,17 @@ export class MortgageApiService {
     )
   }
 
+  brokerClarifyMortgage(id) {
+    const clarifyDecision = {
+      mortgageId: id
+    };
+  
+    return this.http.post<String>(this.apiURL + '/broker/clarification/', JSON.stringify(clarifyDecision), this.httpOptions)
+      .pipe(
+        retry(this.numRetries),
+        catchError(this.handleError)
+    )
+  }
   
   submitClarification(id, txt): Observable<String> {
     const clarificationDecision = {

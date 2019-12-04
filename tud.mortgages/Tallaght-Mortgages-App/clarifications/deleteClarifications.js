@@ -10,8 +10,13 @@ exports.handler = async (event, context) => {
 
   const mortgageId = deleteReq.mortgageId;
 
-  try {    
-    const clars = await clarificationUtils.deleteClarifications(mortgageId);
+  try {
+    const clars = await clarificationUtils.queryClarifications(mortgageId);
+
+    for (const i in clars.Items) {
+      await clarificationUtils.deleteClarifications(clars.Items[i]);
+    }
+    
     const count = clars.Count;
     console.log("items deleted = " + count);
     

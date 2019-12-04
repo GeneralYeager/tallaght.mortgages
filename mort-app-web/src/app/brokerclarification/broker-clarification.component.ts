@@ -40,9 +40,9 @@ export class BrokerClarificationComponent implements OnInit, OnDestroy {
   submitClarification(event) {
     this.mortgageApi.submitClarification(this.mortgageId, this.newClarificationText).subscribe((data) => {
       console.log(data);
-      this.mortgageApi.clarifyMortgage(this.mortgageId).subscribe((data1) => {
+      this.mortgageApi.brokerClarifyMortgage(this.mortgageId).subscribe((data1) => {
         console.log(data1);
-        this.backToUnderwriting();
+        this.backToBrokerPage();
       });
     });
   }
@@ -50,10 +50,10 @@ export class BrokerClarificationComponent implements OnInit, OnDestroy {
   
   backButton(event) {
     event.preventDefault();
-    this.backToUnderwriting()
+    this.backToBrokerPage()
   }
   
-  backToUnderwriting() {
+  backToBrokerPage() {
     this.router.navigate(['/brokers/']);
   }
 
