@@ -39,9 +39,10 @@ export class BrokerClarificationComponent implements OnInit, OnDestroy {
 
   submitClarification(event) {
     this.mortgageApi.submitClarification(this.mortgageId, this.newClarificationText).subscribe((data) => {
-      console.log(data);
+      //console.log(data);
       this.mortgageApi.brokerClarifyMortgage(this.mortgageId).subscribe((data1) => {
         console.log(data1);
+        alert(data1);
         this.backToBrokerPage();
       });
     });

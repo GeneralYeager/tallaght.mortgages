@@ -478,10 +478,8 @@ Resources:
       Environment:
         Variables:
           STEP_FUNCTION_TABLE_NAME: !Ref StepFunctionTokenTableName
-      Policies:
-      - DynamoDBCrudPolicy:
-          TableName: !Ref StepFunctionTokenTableName
-          Events:
+      Role: 
+        Ref: LambdaRoleParameter
       Events:
         BrokerClarificationPOSTEvent:
           Type: Api

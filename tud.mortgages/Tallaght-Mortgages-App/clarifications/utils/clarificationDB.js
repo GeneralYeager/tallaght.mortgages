@@ -40,6 +40,7 @@ exports.addClarification = async function (mortgageId, currMessageId, text) {
     };
  
     const result = await ddb.put(newMessage).promise();
+    console.log(result);
     return result;
   } catch (error) {
       console.log(error);

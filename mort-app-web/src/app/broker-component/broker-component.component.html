@@ -1,9 +1,9 @@
 <alert></alert>
 <h1>{{title}}</h1>
 
-<button mat-button (click)="goToHomePage($event)">Home</button>
-<button mat-button (click)="goToNewMortgage($event)">Create New Mortgage</button>
-<button mat-button (click)="refreshTable($event)">Reload Mortgages</button>
+<button mat-button type="button" (click)="goToHomePage($event)">Home</button>
+<button mat-button type="button" (click)="goToNewMortgage($event)">Create New Mortgage</button>
+<button mat-button type="button" (click)="refreshTable($event)">Reload Mortgages</button>
 
 <table mat-table [dataSource]="mortgageList" multiTemplateDataRows class="table.center mat-elevation-z8">
   <ng-container matColumnDef="{{column}}" *ngFor="let column of columnsToDisplay">
@@ -40,9 +40,9 @@
                 <input matInput placeholder="Term (Years)" [(ngModel)]="element.term" name="term">
               </mat-form-field></td>
             </tr></table>
-            <button mat-button (click)="updateMortgage($event, element)">Save</button>
-            <button *ngIf="element.mortgageStatus=='PreSubmission'" mat-button (click)="submitForApproval($event, element)">Submit For Approval</button>
-            <button *ngIf="element.mortgageStatus=='ClarificationRequested'" mat-button (click)="goToClarification($event, element)">Respond to Clarification</button>
+            <button mat-button type="button" (click)="updateMortgage($event, element)">Save</button>
+            <button type="button" *ngIf="element.mortgageStatus=='PreSubmission'" mat-button (click)="submitForApproval($event, element)">Submit For Approval</button>
+            <button type="button" *ngIf="element.mortgageStatus=='ClarificationRequested'" mat-button (click)="goToClarification($event, element)">Respond to Clarification</button>
           </form>
 
       </div>

@@ -15,7 +15,7 @@ exports.handler = async (event, context, callback) => {
     const brokerClarification = JSON.parse(event.body);
 
     try {
-        
+
         var dbTokenParam = {
             TableName: STEP_FUNCTION_TABLE_NAME,
             Key: {
@@ -24,28 +24,40 @@ exports.handler = async (event, context, callback) => {
         };
 
         const tokenItem = await dynamoDB.get(dbTokenParam).promise();
-        console.log(tokenItem);
-        console.log(`Step Token=[${tokenItem.Item.stepFunctionToken}]`);
-
-        await dynamoDB.delete(dbTokenParam).promise();
 
        // return stepTokenUtil.restartWorkflow(decision.mortgageId, tokenItem.Item.stepFunctionToken, decision.action);
         const brokerClarResp = { 
                 statusCode: 200,
-                Status: `Mortgage has been clarified!` 
+                headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
+                body: JSON.stringify("Mortgage has been clarified!")
         };
+        
+        if (typeof(tokenItem.Item) === "undefined" || tokenItem.Item == null) {
+            return {
+                statusCode: 500,
+                headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
+                body: JSON.stringify("Could not obtain the Step Function token from DynamoDB")
+            };    
+        } else {
+            console.log(tokenItem);
+            console.log(`Step Token=[${tokenItem.Item.stepFunctionToken}]`);
 
-        const result = await stepfunctions.sendTaskSuccess({
-            output: JSON.stringify(brokerClarResp),
-            taskToken: taskToken
-        }).promise();
-        return result;
+            await dynamoDB.delete(dbTokenParam).promise();
+
+
+            const result = await stepfunctions.sendTaskSuccess({
+                output: JSON.stringify(brokerClarResp),
+                taskToken: tokenItem.Item.stepFunctionToken
+            }).promise();
+            console.log(brokerClarResp);
+            return brokerClarResp;
+        }
     } catch (error) {
         console.log(error);
         return {
-            statusCode: 400,
+            statusCode: 500,
             headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
-            error: `Could not obtain the Step Function token from DynamoDB [${error}]`
+            body: JSON.stringify("Could not obtain the Step Function token from DynamoDB")
         };
     }
 }
