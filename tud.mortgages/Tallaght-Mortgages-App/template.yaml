@@ -399,7 +399,7 @@ Resources:
       - WebsocketConnectionsTable
       - MortgageWebSocket
       - StepFunctionTokenTable
-          
+
   ReceiveUnderwriterDecisionGETFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -435,11 +435,45 @@ Resources:
       Environment:
         Variables:
           STEP_FUNCTION_TABLE_NAME: !Ref StepFunctionTokenTableName
-          CLARIFICATION_TABLE_NAME: !Ref ClarificationsTableName
+  #        CLARIFICATION_TABLE_NAME: !Ref ClarificationsTableName
     DependsOn:
       - StepFunctionTokenTable
   #    - ClarificationsTable
 
+  WaitForBrokerClarificationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: workflow/waitForBrokerClarification.handler
+      Runtime: nodejs10.x
+      Environment:
+        Variables:
+          STEP_FUNCTION_TABLE_NAME: !Ref StepFunctionTokenTableName
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref StepFunctionTokenTableName
+    DependsOn:
+      - StepFunctionTokenTable
+
+  BrokerClarificationPOSTFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: workflow/brokerClarificationPOST.handler
+      Runtime: nodejs10.x
+      Environment:
+        Variables:
+          STEP_FUNCTION_TABLE_NAME: !Ref StepFunctionTokenTableName
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref StepFunctionTokenTableName
+          Events:
+      Events:
+        BrokerClarificationPOSTEvent:
+          Type: Api
+          Properties:
+            Path: /broker/clarification
+            Method: POST
+    DependsOn:
+      - StepFunctionTokenTable
 
   # CLARIFICATIONS API    
  # UnderwriterClarificationFunction:

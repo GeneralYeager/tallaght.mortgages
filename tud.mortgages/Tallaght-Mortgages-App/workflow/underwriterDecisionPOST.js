@@ -6,8 +6,8 @@ const stepTokenUtil = require("./utils/restartWorkflow.js");
 const stepfunctions = new AWS.StepFunctions();
 const dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
 
-const { STEP_FUNCTION_TABLE_NAME, CLARIFICATION_TABLE_NAME } = process.env;
-
+//const { STEP_FUNCTION_TABLE_NAME, CLARIFICATION_TABLE_NAME } = process.env;
+const { STEP_FUNCTION_TABLE_NAME } = process.env;
 
 exports.handler = async (event, context, callback) => {
 
