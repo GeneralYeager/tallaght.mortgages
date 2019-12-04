@@ -79,7 +79,7 @@ Resources:
       Role: 
         Ref: LambdaRoleParameter
       Events:
-        GetCustomerEvent:
+        GetClarificationsEvent:
           Type: Api
           Properties:
             Path: /clarifications/{id}
@@ -96,7 +96,7 @@ Resources:
       Role: 
         Ref: LambdaRoleParameter
       Events:
-        CreateCustomerEvent:
+        AddClarificationEvent:
           Type: Api
           Properties:
             Path: /clarifications/
@@ -104,7 +104,23 @@ Resources:
       Environment:
         Variables:
           CLARIFICATION_TABLE_NAME: !Ref ClarificationsTableName
-
+  DeleteClarificationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: clarifications/
+      Handler: deleteClarifications.handler
+      Runtime: nodejs10.x
+      Role: 
+        Ref: LambdaRoleParameter
+      Events:
+        DeleteClarificationsEvent:
+          Type: Api
+          Properties:
+            Path: /clarifications/
+            Method: DELETE
+      Environment:
+        Variables:
+          CLARIFICATION_TABLE_NAME: !Ref ClarificationsTableName
 
 
   # CUSTOMER APIS

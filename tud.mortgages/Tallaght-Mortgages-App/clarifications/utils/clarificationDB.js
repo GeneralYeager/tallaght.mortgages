@@ -46,3 +46,26 @@ exports.addClarification = async function (mortgageId, currMessageId, text) {
       return null;
   }
 };
+
+exports.deleteClarifications = async function (mortgageId) {
+
+  try {
+    var params = {
+      RequestItems: {
+        CLARIFICATION_TABLE_NAME: [
+          {
+            DeleteRequest: {
+              Key: { HashKey: mortgageId }
+            }
+          }
+        ]
+      }
+    };
+ 
+    const deleteResult = await ddb.batchWrite(params);
+    return deleteResult;
+  } catch (error) {
+      console.log(error);
+      return null;
+  }
+};
