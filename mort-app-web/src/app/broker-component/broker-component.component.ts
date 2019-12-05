@@ -8,6 +8,8 @@ import { UnderwriterNotificationsService } from "../underwriter-notifications.se
 import { AlertService } from '../_alert';
 import { Subscription } from 'rxjs'
 
+import { NewWebsocketService, Message } from "../newwebsocket.service"
+
 @Component({
   selector: 'app-broker-component',
   templateUrl: './broker-component.component.html',
@@ -32,25 +34,33 @@ export class BrokerComponentComponent implements OnInit, OnDestroy {
 
   constructor(private router: Router, 
               private mortgageApi: MortgageApiService,
-              private messagesService: UnderwriterNotificationsService, 
+              //private messagesService: UnderwriterNotificationsService, 
+              private messagesService: NewWebsocketService,
               private alertService: AlertService) { 
                 console.log("construct Broker Component");
   }
 
   ngOnInit() {
-    this.subscription = this.messagesService.messages.subscribe(msg => {
-      console.log("Broker from websocket: " + msg.message);
-      if (msg.audience == 'Broker') {
-        if (msg.AlertType == "Success")
-          this.alertService.success(msg.message);
-        else if (msg.AlertType == "Error")
-          this.alertService.error(msg.message);
-        else 
-          this.alertService.warn(msg.message);
-      }
-      
-      this.loadMortgages();
-    });
+
+
+    this.subscription = this.messagesService.subscribe(
+      (msg: Message) => {
+        if (msg.audience == 'Broker') {
+          if (msg.AlertType == "Success")
+            this.alertService.success(msg.message);
+          else if (msg.AlertType == "Error")
+            this.alertService.error(msg.message);
+          else 
+            this.alertService.warn(msg.message);
+        }
+        this.loadMortgages();
+      },
+      err => {
+        console.log(err) // Called if at any point WebSocket API signals some kind of error.
+      },
+      () => console.log('complete') // Called when connection is closed (for whatever reason).
+    );
+    console.log("after");
     this.loadMortgages();
   }
 
@@ -99,8 +109,8 @@ export class BrokerComponentComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    console.log("ngOnDestroy");
+    //this.subscription.unsubscribe();
+    this.messagesService.unsubscribe(this.subscription);
   }
-
-  
 }
