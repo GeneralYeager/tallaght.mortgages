@@ -206,31 +206,27 @@
  		"Next": "WaitForClarification"
  	},
  
- 	"WaitForClarification": {
- 		"Type": "Task",
- 		"Parameters": {
-  			"mortgage.$": "$.mortgage",
- 			"newStatus": "ClarificationRequested"
- 		},
- 		"Resource": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-ChangeMortgageStatusFunction-18FMNJO869F0E",
- 		"Next": "ClarificationResult"
- 	},
- 
-         "ClarificationResult": {
-             "Type": "Pass",
-             
-             "End": true
+    "WaitForClarification": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+        "Parameters": {
+            "FunctionName": "arn:aws:lambda:eu-west-1:727432808710:function:Mortgages-Stack-WaitForBrokerClarificationFunction-LQPMH8SV90HV",
+            "Payload": {
+              "mortgage.$": "$.mortgage",
+              "ExecutionContext.$": "$$"
+            }
         },
+        "TimeoutSeconds": 180,
+        "ResultPath": "$.lambdaresult",
+        "Next": "ClarificationResult"
+    },
+        
+    "ClarificationResult": {
+        "Type": "Pass",
+        "Next": "UpdateStatusToWithUnderwriter"
+    },
  
- 
- 
- 
- 
- 
- 
- 
- 
-      	"UpdateStatusToUnderwriterApproved": {
+       	"UpdateStatusToUnderwriterApproved": {
 			"Type": "Task",
           	"Parameters": {
 				"mortgage.$": "$.mortgage",
