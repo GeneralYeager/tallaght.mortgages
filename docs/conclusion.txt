@@ -1,0 +1,111 @@
+Serverless architecture is a development paradigm where applications (composed of many small, independent services/components) are run in cloud PaaS services perhaps on containers temporarily created for executing individual functions. Serverless is also referred to as Function as a Service (FaaS).
+
+The advantages are rapid and automatic scaling and the cost advantages of paying only for what you use, i.e. the number of requests and function execution duration.
+
+There are however also significant drawbacks. These include:
+
+Vendor lock-in: Once you have invested in building the software and the operations processes around a serverless application like AWS Lambda it will be expensive and time-consuming to port to any other vendor. The workaround for this is to create a separate function for your business logic and then call that from a Lambda handler. Although there are some ways to mitigate vendor lock-in, there are none for vendor control.
+
+Execution Constraints: The temparory containers uses in AWS Lambda result in limits on the amount of memory and execution time. Currently Lambda functions are limited 128 KB for event request body. Memory is limited at 2GB RAM and 5 minutes of execution time. Disk space is also limited to 512 MB. So for functions that may be short lived but need bursts of memory, perhaps to read / tranform large files would not be suitable for AWS Lambda. The workaround for limited execution time could be to use a step function (which we discuss later) or SQS to build a sequence of smalled functions or using Lambda to start and AWS Batch process.
+
+Cold Starts: AWS Lambda uses temporarily created containers, so in order to execute your function as soon as the client submits the request AWS Lambda must create a temporary container, deploy all dependencies and run the required code. After the request is completed, the container may be destroyed.This process can take between 100 milliseconds to 2 minutes. This Cold Start can cause significant response delays. The workaround is cumbersome in that it requries the developer to try to keep the function in a Warm state for example by pinging the function at regular intervals to prevent AWS Lambda reclaiming the container.
+
+Some of these restrictions may be viewed as enforcing good architectural principles. Long running processess are better suited to Beanstalk, AWS Batch or EC2. Large payload requests in many cases indicates a function / service is trying to do too much. A review of how to refactor the function into more modular, composable services/endpoints should be undertaken. Some of these limitation prevent developers trying to abuse the Serverless architecture by deploying monolithic applications in an unsuitable way.
+
+Lambda is a very versatile managed service but I would suggest that at this point is has a set of suitable problem domains and does not at this point provide a platform that will accomodate all use cases. The most suitable use cases that I am aware of at the moment are listed below.
+
+
+AWS Lambda and S3 hosted static websites. Host the web frontend files (html, javascript, images etc) on S3, and use content delivery via Cloudfront. Lambda functions can host the  logic for the API Gateway HTTP endpoints and persist data to a managed Database. Lambda, API Gateway and S3 pricing is pay only for the traffic, so the only fixed cost will be the database.
+
+Processing S3 Objects. Using S3 event notifications as triggers for Lambda execution. This solution is very cost effective and scaling is managed by AWS.
+
+Data Transformation. AWS Lambda is highly scalable which provides an ideal platform for ETL type processing and transfering data between S3, Redshift, Kinesis and database services.
+
+
+Many user of AWS Lambda have found gaps whenever they need the following features:
+- Imposing a sequence on a set of Functions
+- Error handling / retry behaviour over that set of Functions
+- Choose Function execution based on real time data.
+- Parallelism
+- Long running tasks
+Manage state between stateless functions involve setting up queues and databases. This increases overhead and can be time-consuming and complex.
+
+
+AWS Step Functions provide a managed service that allow Scaling, State managements, error handling and auditing.
+
+Step Functions provide state machines that manage workflows of many Serverless functions using extensive JSON declaritive language.
+
+They provide a resilient way to iterate though a sequence of AWS services that allows building multi-step applications.
+It allows the combination of synchronous external invocations such as HTTP API operations via AWS API Gateway with robust asynchronous state machine processing.
+
+The barrier to entry is cost. Step Fuction priceing at $0.025 per 1,000 executions, is 100x times more expensive per invocation than Lambda.
+
+This price level makes it difficult to be cost-effective to replace existing custom Lambda solutions that maintain state.
+
+Step Functions have many useful features for the business process use cases - executions can span 12 months, allow task timeouts and interrupts, configure tasks with heartbeats, 
+
+However it would be much easier to adopt if it supported low cost, high-scalable state machines using an event-driven paradigm. Modern software development encourages loosely coupled, event driven design. However, Step Functions Workers (called activities) must poll for tasks, and Lambda invocations by Step Functions are synchronous. 
+
+One feature that I think would be very useful is to allow the specification of tasks as an ARN or HTTP endpoint (e.g. asynchronous Lambda, SNS topic, HTTP endpoint, etc.), with a URL provided in the payload for posting back the output. This would allow Step Function state machines to more fully integrate with event-driven architectures. The current Step Function solution to this allows developers to call the waitForTaskToken method from the State Machine task and pause until a developer calls the Step Function SDK using a token to resume the execution. It would be neater if this could be done directly by usign a specific execution HTTP endpoint.
+
+
+Step Functions makes it easy to set up state management early on, and it continues to work well as your application scales and you add more services into the mix.
+
+The state machine can be seen as used as a visual contruct in the AWS Admin console and is easy to understand. The States Language supports re-try, loop, back-off, timeout, parrallel and choice constructs.
+
+However, the lack of tooling / external IDEs may be an impediment to adoption.
+It is relatively quick to create complex sequences of tasks Orchestrating a sequence individual Serverless functions. 
+
+For complex workflows that involve many different states and branching logic, the visual workflow is an intuitive design and diagnostic tool.
+Developers and DevOps can look at the workflow diagram for running or completed execution and diagnose. It is intuitive to understand the state of the system without knowing the details of its implementation. It is possible because the workflow rule and design decisions in the workflow have been lifted out of the code and made explicit in a visual format that anyone can follow.
+
+It is also good practice to decouple workflow logic from business logic. To do otherwise increases the complexity of the applications and reduces their reuse value. In addition, managing state separately from serverless functions allows developers to focus on business logic.
+
+While AWS Step Functions provides solutions to a number of design challenges in the Serverless framework, transitioning all your orchestration layers may not be suitable for all use cases.
+
+The AWS Lambda team restrict the use of recursive Lambda functions because it is very prone to error. An orchestration service like Step Functions shoud be used instead.
+
+You can put explicit branching checks in place and enforce timeouts at the workflow level. It helps prevent accidental infinite recursions.
+
+
+The drawbacks of Step Functions include: 
+
+Configuration with the Amazon States Language Amazon States Language is quite complex; its syntax is based on JSON and therefore optimized for machine readability instead of readability by humans. Learning the language is not practical for non-developers. It is also AWS specific and not open source.
+
+Decoupling services from the orchestration provides scalable, composable functions, but the developers need to learn an entirely separate service.
+
+
+If you need rapid iteration and all your application actions are performed using AWS Lambda functions, AWS Step Functions is an ideal solution. It will reduce the time spent developing orchestration logic and therefore allow you to focus more on your business logic.
+
+
+However there are use cases where AWS Step Functions are not suitable
+
+Critical payment/financial systems. Step Functions could be very expensive as number of financial transactions increases.
+Scheduling applications. Step Functions doesn’t support schedules, and AWS Lambda already has an integrated scheduling system. It’s better to use Serverless and Lambda scheduling functionality directly.
+
+
+ENHANCEMENTS
+
+Cool Service Console
+One thing that I would like to highlight here is the AWS Console. Usually, AWS doesn’t provide a nice console to interact with and that’s ok because after a bit of experience with the service a developer usually switches to use the service via API, CLI, SDK, or even CloudFormation.
+
+With Step Functions, AWS creates a user-friendly experience by providing a lot of blueprints but also a nice UI with all the information needed. In fact, on the creation phase of a State Machine, you can start from different kinds of blueprints and you have two boxes. The Preview box represents the State Machine that you are building and is based on the Code box, positioned below it. Once you are satisfied with your State Machine, you can create it and start simulating all the executions that you need. Here the AWS Console is also helpful. For each execution, you have all of the logs that you need, both at the execution and single state level.
+
+What I’d like to see in the future
+I used this service a couple of times and there are several features that I feel are missing:
+
+Price model
+The first point is the price. With complex task, AWS Step Functions is mandatory but at a high cost. I hope that a price reduction or, even better, a pricing model similar to CloudFormation, ElasticBeanstalk, or ECS, is forthcoming. Those services offer a “pay only for what you use model.” Instead, with Step Functions, you pay for the resources that you use (Lambda, EC2, on-premise servers), but also for states that only wait or just pass to the next one.
+
+Where are triggers?
+With Lambda, AWS teaches us to love events and triggers. Where are they? It would be nice to start an execution in response to an event such as Amazon DynamoDB or Amazon Kinesis streams, AWS Code Commit push, or automatically pull messages from an Amazon SQS Queue. Now, you are able to integrate Step Functions with Amazon API Gateway, which makes human tasks possible in our executions. Yesterday AWS announced the integration between CloudWatch Events and Step Functions. That is good news because means that AWS is working on integrating more triggers with this service.
+
+What about push events to other services?
+Even the opposite feature of triggers is missing. Here, I’m talking about the ability to automatically send the event received from the previous state in my State Machine to other AWS Services. For example, I’d like to receive a notification for each execution that ends without error. The last state of my State Machine could be an integration with Amazon SNS that without any further code will trigger alerts.
+
+
+
+
+
+
+
